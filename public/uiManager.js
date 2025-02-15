@@ -63,7 +63,7 @@ export class UIManager {
       this.mostrarHome();
     });
 
-    // Eventos del modal de eliminación
+    // Modal de eliminación
     this.$confirmDeleteBtn.addEventListener("click", () => {
       if (this.periodoAEliminar) {
         this.handleEliminarPeriodo(this.periodoAEliminar);
@@ -72,12 +72,11 @@ export class UIManager {
     });
     this.$cancelDeleteBtn.addEventListener("click", () => this.hideDeleteConfirmation());
 
-    // Eventos del modal de creación de periodo
+    // Modal de creación de periodo
     this.$createPeriodForm.addEventListener("submit", (e) => {
       e.preventDefault();
       this.handleCreatePeriodSubmit();
     });
-
     this.$cancelCreatePeriodBtn.addEventListener("click", () => this.hideCreatePeriodModal());
   }
 
@@ -89,7 +88,6 @@ export class UIManager {
   }
 
   hideCreatePeriodModal() {
-    console.log("LLEGA ACAs")
     this.$createPeriodModal.classList.add("hidden");
     this.$createPeriodModal.setAttribute("aria-hidden", "true");
   }
@@ -97,15 +95,6 @@ export class UIManager {
   showCreatePeriodError(message) {
     this.$createPeriodError.textContent = message;
     this.$createPeriodError.style.display = "block";
-  }
-
-  parseMonthYear(value) {
-    const [monthStr, yearStr] = value.split('/');
-    // Asumimos que el año es de dos dígitos (por ejemplo, "24" => 2024)
-    const month = parseInt(monthStr, 10);
-    const year = 2000 + parseInt(yearStr, 10);
-    // Usamos el constructor numérico: año, mes (0-indexado), día
-    return new Date(year, month - 1, 1);
   }
 
   handleCreatePeriodSubmit() {
@@ -118,14 +107,11 @@ export class UIManager {
       this.showCreatePeriodError("Todos los campos son obligatorios.");
       return;
     }
-    // Extraemos año y mes de startValue y endValue
+
     const [startYear, startMonth] = startValue.split("-").map(Number);
     const [endYear, endMonth] = endValue.split("-").map(Number);
-
-    // Construimos las fechas usando el constructor (año, mes - 1, día)
     const startDate = new Date(startYear, startMonth - 1, 1);
     const endDate = new Date(endYear, endMonth - 1, 1);
-
 
     if (endDate <= startDate) {
       this.showCreatePeriodError("La fecha de fin debe ser posterior a la fecha de inicio.");
@@ -160,11 +146,9 @@ export class UIManager {
   generarMeses(startDate, endDate) {
     const meses = [];
     const current = new Date(startDate);
-    console.log("START DATE",{current:current,startDate:startDate,endDate:endDate})
     while (current <= endDate) {
       const month = (current.getMonth() + 1).toString().padStart(2, "0");
       const year = current.getFullYear().toString().slice(-2);
-      console.log("MONTH DATE",{month:month,year:year,})
       meses.push({
         mes: `${month}/${year}`,
         inflacion: 0,
@@ -177,7 +161,8 @@ export class UIManager {
     }
     return meses;
   }
-  getNuevoMesNombre(){
+
+  getNuevoMesNombre() {
     const meses = this.periodoSeleccionado.meses;
     if (meses.length === 0) {
       alert("No hay meses en este periodo.");
@@ -194,9 +179,9 @@ export class UIManager {
     }
     return mes.toString().padStart(2, "0") + "/" + anio.toString().slice(-2);
   }
+
   handleAgregarMes() {
     if (!this.periodoSeleccionado) return;
-   
     const nuevoMes = {
       mes: this.getNuevoMesNombre(),
       inflacion: 0,
@@ -318,12 +303,12 @@ export class UIManager {
     this.mostrarDetalle();
   }
 
-  handleDuplicationPeriodo(id){
+  handleDuplicationPeriodo(id) {
     this.periodoService.duplicarPeriodo(id);
     this.periodoSeleccionado = this.periodoService.obtenerPeriodoPorId(id);
     this.mostrarDetalle();
-    
   }
+
   handleVerResultados(id) {
     this.periodoSeleccionado = this.periodoService.obtenerPeriodoPorId(id);
     if (!this.periodoSeleccionado) return;
@@ -344,7 +329,6 @@ export class UIManager {
     this.$viewResultados.classList.add("hidden");
     this.$periodoNombre.textContent = "Periodo: " + this.periodoSeleccionado.nombre;
     this.$periodoDates.textContent = `Desde ${this.periodoSeleccionado.fechaInicio} hasta ${this.periodoSeleccionado.fechaFin}`;
-  
     this.renderMeses();
     this.calcularYMostrarMetricas();
   }
@@ -395,7 +379,6 @@ export class UIManager {
     `;
     return card;
   }
-
 
   handleGuardarPeriodo() {
     if (!this.periodoSeleccionado) return;

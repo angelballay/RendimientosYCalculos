@@ -24,39 +24,45 @@
     <main id="main-content">
       <header>
         <h1>Gestión de Periodos y Cálculos Financieros</h1>
+        <p class="help-text app-subtitle">Administra tus planes y obtén proyecciones financieras precisas.</p>
       </header>
 
       <!-- Vista Home: Listado de Periodos -->
       <section id="view-home">
         <h2>Listado de Periodos</h2>
-        <!-- Aquí se inyectará la tabla con la lista de periodos -->
+        <p class="help-text">
+          En esta sección encontrarás todos los planes creados. Haz clic en "Detalles" para ver la información completa o en "Eliminar" para remover un periodo.
+        </p>
         <div id="periodos-lista" class="card-container"></div>
-        <button id="btn-nuevo-periodo" aria-label="Crear Nuevo Periodo">Crear Nuevo Periodo</button>
+        <button id="btn-nuevo-periodo" class="btn-primary" aria-label="Crear Nuevo Periodo">Crear Nuevo Periodo</button>
       </section>
 
       <!-- Vista Detalle: Edición de Meses del Periodo -->
       <section id="view-detalle" class="hidden">
         <h2 id="periodo-nombre">Detalles del Periodo</h2>
-        <h3 id="periodo-hasta">Fecha periodo</h3>
+        <h3 id="periodo-hasta" class="help-text"></h3>
         <div id="meses-lista" class="card-container"></div>
         <div class="acciones-meses">
-          <button id="btn-agregar-mes" aria-label="Agregar Nuevo Mes">Agregar Mes</button>
-          <button id="btn-repetir-mes" aria-label="Repetir Datos del Mes Anterior">Repetir del Mes Anterior</button>
-          <button id="btn-guardar-periodo" aria-label="Guardar Cambios">Guardar Cambios</button>
+          <button id="btn-agregar-mes" class="btn-primary" aria-label="Agregar Nuevo Mes">Agregar Mes</button>
+          <button id="btn-repetir-mes" class="btn-secondary" aria-label="Repetir Datos del Mes Anterior">Repetir del Mes Anterior</button>
+          <button id="btn-guardar-periodo" class="btn-success" aria-label="Guardar Cambios">Guardar Cambios</button>
         </div>
         <div class="navegacion-detalle">
-          <button id="btn-ver-resultados" aria-label="Ver Resultados">Ver Resultados</button>
-          <button id="btn-volver-home" aria-label="Volver al Listado de Periodos">Volver a Periodos</button>
+          <button id="btn-ver-resultados" class="btn-primary" aria-label="Ver Resultados">Ver Resultados</button>
+          <button id="btn-volver-home" class="btn-secondary" aria-label="Volver al Listado de Periodos">Volver a Periodos</button>
         </div>
       </section>
 
       <!-- Vista Resultados: Reporte de Métricas -->
       <section id="view-resultados" class="hidden">
         <h2>Resultados del Periodo</h2>
+        <p class="help-text">
+          Visualiza el rendimiento y las métricas financieras generadas automáticamente.
+        </p>
         <div id="metrics"></div>
         <div class="navegacion-resultados">
-          <button id="btn-volver-detalle" aria-label="Volver al Detalle del Periodo">Volver al Detalle</button>
-          <button id="btn-volver-home2" aria-label="Volver al Listado de Periodos">Volver a Periodos</button>
+          <button id="btn-volver-detalle" class="btn-secondary" aria-label="Volver al Detalle del Periodo">Volver al Detalle</button>
+          <button id="btn-volver-home2" class="btn-secondary" aria-label="Volver al Listado de Periodos">Volver a Periodos</button>
         </div>
       </section>
     </main>
@@ -68,7 +74,7 @@
   <!-- Modal para confirmación de eliminación -->
   <div id="delete-confirmation-modal" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-content" role="dialog" aria-labelledby="deleteModalTitle">
-      <p id="deleteModalTitle">¿Está seguro de eliminar este periodo?</p>
+      <p id="deleteModalTitle" class="modal-title">¿Está seguro de eliminar este periodo?</p>
       <div class="modal-actions">
         <button id="confirm-delete-btn" class="btn-danger">Eliminar</button>
         <button id="cancel-delete-btn" class="btn-neutral">Cancelar</button>

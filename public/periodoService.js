@@ -56,24 +56,24 @@ export class PeriodoService {
       fechaCreacion: new Date().toLocaleString(),
       ultimaActualizacion: new Date().toLocaleString()
     };
-    this.guardarNuevoPeriodo(nuevoPeriodo)
+    this.guardarNuevoPeriodo(nuevoPeriodo);
     return nuevoPeriodo;
   }
 
-  guardarNuevoPeriodo(nuevoPeriodo){
+  guardarNuevoPeriodo(nuevoPeriodo) {
     this.periodos.push(nuevoPeriodo);
     this.guardarPeriodos();
   }
 
-  duplicarPeriodo(id){
+  duplicarPeriodo(id) {
     const dup = this.obtenerPeriodoPorId(id);
-    const duplicadoPeriodo = {...dup};
+    const duplicadoPeriodo = { ...dup };
     duplicadoPeriodo.nombre = "Copia " + duplicadoPeriodo.nombre + "1";
-    duplicadoPeriodo.id = Date.now().toString(),
-    duplicadoPeriodo.fechaCreacion= new Date().toLocaleString(),
-    duplicadoPeriodo.ultimaActualizacion =  new Date().toLocaleString()
+    duplicadoPeriodo.id = Date.now().toString();
+    duplicadoPeriodo.fechaCreacion = new Date().toLocaleString();
+    duplicadoPeriodo.ultimaActualizacion = new Date().toLocaleString();
 
-    this.guardarNuevoPeriodo(duplicadoPeriodo)
+    this.guardarNuevoPeriodo(duplicadoPeriodo);
     return duplicadoPeriodo;
   }
 

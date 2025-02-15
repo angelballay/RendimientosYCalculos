@@ -1,21 +1,23 @@
-/* Global Styles */
+/* ---------------------- */
+/* GLOBAL STYLES         */
+/* ---------------------- */
+
+/* Base de la tipografía y colores de fondo */
 body {
   font-family: 'Roboto', sans-serif;
-  background-color: #f4f4f4;
+  font-size: 16px;
+  background: linear-gradient(120deg, #1a2a6c, #2b5876, #4e4376);
   margin: 0;
   padding: 0;
-  color: #333;
+  color: #fff;
 }
 
-/* Contenedor principal que engloba el sidebar y el contenido */
-#app-container {
-  display: flex;
-  min-height: 100vh;
-}
+/* ---------------------- */
+/* SIDEBAR               */
+/* ---------------------- */
 
-/* Menú lateral */
 #sidebar {
-  background-color: #2c3e50;
+  background-color: rgba(0, 0, 0, 0.25);
   color: #ecf0f1;
   width: 220px;
   padding: 20px;
@@ -25,6 +27,7 @@ body {
 #sidebar nav ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 #sidebar nav ul li {
@@ -34,60 +37,84 @@ body {
 #sidebar nav ul li a {
   color: #ecf0f1;
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 500;
+  transition: color 0.3s ease;
 }
 
-/* Contenido principal */
+#sidebar nav ul li a:hover,
+#sidebar nav ul li a:focus {
+  color: #ffffff;
+  outline: none;
+}
+
+/* ---------------------- */
+/* CONTENIDO PRINCIPAL   */
+/* ---------------------- */
+
 #main-content {
   flex: 1;
   padding: 20px;
   box-sizing: border-box;
+  background-color: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(4px);
 }
 
+/* ENCABEZADO */
 header {
-  background-color: #007BFF;
-  color: #fff;
+  background: rgba(0, 0, 0, 0.3);
   padding: 20px;
   text-align: center;
+  border-radius: 8px;
+  margin-bottom: 20px;
 }
 
 header h1 {
   margin: 0;
   font-size: 2rem;
+  color: #fff;
+  text-shadow: 1px 1px 2px #000;
 }
 
-header p {
-  margin: 10px 0 0;
+.app-subtitle {
+  margin: 5px 0 0;
   font-size: 1rem;
+  color: #d4d4d4;
+  opacity: 0.9;
 }
 
-main {
-  max-width: 900px;
-  margin: 20px auto;
-  padding: 0 15px;
+/* Clase unificada para textos de ayuda */
+.help-text {
+  font-size: 0.9rem;
+  color: #ececec;
+  margin-bottom: 15px;
+  opacity: 0.85;
 }
 
-/* Secciones de Vistas */
+/* SECCIONES DE VISTAS */
 section {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.15);
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
 .hidden {
-  display: none !important;
+  display: none !important; 
 }
 
 h2 {
   margin-top: 0;
   font-size: 1.5rem;
-  border-bottom: 2px solid #007BFF;
+  border-bottom: 2px solid #00bfff;
   padding-bottom: 5px;
+  color: #fff;
 }
 
-/* Card Container for Listados */
+/* ---------------------- */
+/* LISTADOS: TARJETAS Y TABLAS  */
+/* ---------------------- */
+
 .card-container {
   display: flex;
   flex-wrap: wrap;
@@ -95,15 +122,16 @@ h2 {
   margin-bottom: 15px;
 }
 
-/* Tarjetas para Periodos y Meses */
+/* Tarjetas (para otros contextos) */
 .card {
-  background: #f9f9f9;
-  border: 1px solid #ccc;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid #555;
   border-radius: 8px;
   padding: 15px;
   flex: 1 1 250px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   transition: transform 0.3s ease, opacity 0.3s ease;
+  will-change: transform;
 }
 
 .card:hover {
@@ -111,29 +139,127 @@ h2 {
   opacity: 0.95;
 }
 
-/* Ejemplo de estilo para destacar Ganancia Real */
-.ganancia-real {
-  font-weight: bold;
-  color: #28a745;
+/* Estilos para la tabla de periodos */
+.table-periodos {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 15px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-/* Botones */
-button {
-  background-color: #007BFF;
+.table-periodos th,
+.table-periodos td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.table-periodos thead tr {
+  background: rgba(0,0,0,0.2);
+}
+
+.table-periodos thead th {
+  font-weight: 500;
   color: #fff;
+  border-bottom: 1px solid #00bfff;
+}
+
+.table-periodos tbody tr {
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  will-change: background-color;
+}
+
+.table-periodos tbody tr:hover {
+  background-color: rgba(255,255,255,0.1);
+  box-shadow: 0 0 8px rgba(255,255,255,0.2);
+}
+
+.table-periodos td {
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* ---------------------- */
+/* BOTONES               */
+/* ---------------------- */
+
+button {
   border: none;
   border-radius: 4px;
   padding: 10px 15px;
   margin: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-size: 0.95rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  will-change: transform;
 }
 
-button:hover {
-  background-color: #0056b3;
+button:hover,
+button:focus {
+  transform: scale(1.02);
+  outline: none;
 }
 
-/* Acciones en Vista de Meses y Navegación */
+/* Botón primario (azul brillante) */
+.btn-primary {
+  background-color: #008cff;
+  color: #fff;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #0073cc;
+}
+
+/* Botón secundario (gris) */
+.btn-secondary {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background-color: #5a6268;
+}
+
+/* Botón éxito (verde) */
+.btn-success {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.btn-success:hover,
+.btn-success:focus {
+  background-color: #218838;
+}
+
+/* Botón peligro (rojo) */
+.btn-danger {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.btn-danger:hover,
+.btn-danger:focus {
+  background-color: #c82333;
+}
+
+/* Botón neutro (gris claro) */
+.btn-neutral {
+  background-color: #999;
+  color: #fff;
+}
+
+.btn-neutral:hover,
+.btn-neutral:focus {
+  background-color: #888;
+}
+
+/* ---------------------- */
+/* ACCIONES EN VISTA     */
+/* ---------------------- */
+
 .acciones-meses,
 .navegacion-detalle,
 .navegacion-resultados {
@@ -143,67 +269,38 @@ button:hover {
   margin-top: 10px;
 }
 
-/* Inputs en tarjetas (para meses) */
+/* Inputs y Textareas en tarjetas y modales */
 .card input[type="text"],
-.card input[type="number"] {
+.card input[type="number"],
+.card textarea,
+.modal-input,
+.modal-textarea {
   width: 100%;
   padding: 8px;
   margin-top: 5px;
   border: 1px solid #ccc;
   border-radius: 4px;
-}
-
-/* Results Section */
-#metrics p {
-  margin: 5px 0;
-}
-
-/* Footer */
-footer {
-  background-color: #333;
-  color: #fff;
-  text-align: center;
-  padding: 15px;
   font-size: 0.9rem;
 }
 
-/* Responsive adjustments */
-@media (max-width: 600px) {
-  #sidebar {
-    width: 180px;
-    padding: 15px;
-  }
-  .card {
-    flex: 1 1 100%;
-  }
+/* Mensajes de error */
+.error-message {
+  color: #d9534f;
+  font-weight: 500;
+  margin-bottom: 10px;
 }
 
-/* Tabla de periodos */
-.table-periodos {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 15px;
-}
+/* ---------------------- */
+/* MODAL OVERLAY         */
+/* ---------------------- */
 
-.table-periodos th,
-.table-periodos td {
-  border: 1px solid #ccc;
-  padding: 10px;
-  text-align: left;
-}
-
-.table-periodos th {
-  background-color: #f2f2f2;
-}
-
-/* Modal Overlay */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(10, 10, 10, 0.7);
   z-index: 999;
   display: flex;
   justify-content: center;
@@ -211,20 +308,14 @@ footer {
 }
 
 .modal-content {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
   max-width: 500px;
   width: 90%;
   padding: 25px;
   border-radius: 8px;
   text-align: left;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-
-/* Estilos para el modal de creación de periodo */
-.create-period-modal {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
 }
 
 .modal-title {
@@ -239,26 +330,6 @@ footer {
   display: block;
 }
 
-.modal-input {
-  width: 100%;
-  padding: 10px;
-  font-size: 1rem;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.modal-textarea {
-  width: 100%;
-  height: 80px;
-  resize: vertical;
-  padding: 10px;
-  font-size: 1rem;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
 .modal-actions {
   display: flex;
   justify-content: space-between;
@@ -270,13 +341,6 @@ footer {
   flex: 1;
   padding: 10px 15px;
   font-size: 1rem;
-}
-
-/* Mensajes de error */
-.error-message {
-  color: #d9534f;
-  font-weight: 500;
-  margin-bottom: 10px;
 }
 
 /* Responsividad - pantallas pequeñas */
@@ -294,5 +358,32 @@ footer {
   }
   .modal-btn {
     font-size: 0.9rem;
+  }
+}
+
+/* ---------------------- */
+/* FOOTER                */
+/* ---------------------- */
+
+footer {
+  background-color: rgba(0, 0, 0, 0.3);
+  color: #fff;
+  text-align: center;
+  padding: 15px;
+  font-size: 0.9rem;
+  margin-top: 20px;
+}
+
+/* ---------------------- */
+/* RESPONSIVE ADJUSTMENTS*/
+/* ---------------------- */
+
+@media (max-width: 600px) {
+  #sidebar {
+    width: 180px;
+    padding: 15px;
+  }
+  .card {
+    flex: 1 1 100%;
   }
 }
