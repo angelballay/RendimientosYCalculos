@@ -79,25 +79,25 @@
   <!-- Modal para creación de periodo -->
   <div id="create-period-modal" class="modal-overlay hidden" aria-hidden="true">
     <div class="modal-content" role="dialog" aria-labelledby="createPeriodModalTitle">
-      <h3 id="createPeriodModalTitle">Crear Nuevo Periodo</h3>
+      <h3 id="createPeriodModalTitle" class="modal-title">Crear Nuevo Periodo</h3>
       <form id="create-period-form">
-        <label for="period-start">Fecha de Inicio (Mes/Año):</label>
-        <input type="month" id="period-start" name="periodStart" required>
+        <label for="period-start" class="modal-label">Fecha de Inicio (Mes/Año):</label>
+        <input type="month" id="period-start" name="periodStart" class="modal-input" required>
         
-        <label for="period-end">Fecha de Fin (Mes/Año):</label>
-        <input type="month" id="period-end" name="periodEnd" required>
+        <label for="period-end" class="modal-label">Fecha de Fin (Mes/Año):</label>
+        <input type="month" id="period-end" name="periodEnd" class="modal-input" required>
         
-        <label for="period-name">Nombre del Periodo:</label>
-        <input type="text" id="period-name" name="periodName" required>
+        <label for="period-name" class="modal-label">Nombre del Periodo:</label>
+        <input type="text" id="period-name" name="periodName" class="modal-input" placeholder="Ej: 2024 - Q1" required>
         
-        <label for="period-description">Descripción:</label>
-        <textarea id="period-description" name="periodDescription" required></textarea>
+        <label for="period-description" class="modal-label">Descripción:</label>
+        <textarea id="period-description" name="periodDescription" class="modal-textarea" placeholder="Breve descripción..." required></textarea>
         
-        <div id="create-period-error" class="error-message" style="color: red; display: none;"></div>
+        <div id="create-period-error" class="error-message" style="display: none;"></div>
         
         <div class="modal-actions">
-          <button type="submit" class="btn-primary">Crear Periodo</button>
-          <button type="button" id="cancel-create-period-btn" class="btn-neutral">Cancelar</button>
+          <button type="submit" class="btn-primary modal-btn">Crear Periodo</button>
+          <button type="button" id="cancel-create-period-btn" class="btn-neutral modal-btn">Cancelar</button>
         </div>
       </form>
     </div>

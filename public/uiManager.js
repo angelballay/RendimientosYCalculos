@@ -77,6 +77,7 @@ export class UIManager {
       e.preventDefault();
       this.handleCreatePeriodSubmit();
     });
+
     this.$cancelCreatePeriodBtn.addEventListener("click", () => this.hideCreatePeriodModal());
   }
 
@@ -88,6 +89,7 @@ export class UIManager {
   }
 
   hideCreatePeriodModal() {
+    console.log("LLEGA ACAs")
     this.$createPeriodModal.classList.add("hidden");
     this.$createPeriodModal.setAttribute("aria-hidden", "true");
   }
