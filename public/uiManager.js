@@ -1,251 +1,13 @@
-// Definición de la clave secreta para encriptar y desencriptar en localStorage
-const secretKey = "mySuperSecretKey123";
-
 /**
- * FinancialCalculator
- * Clase con métodos estáticos para realizar cálculos financieros específicos.
- * Cada método se encarga de un único cómputo, siguiendo el principio de responsabilidad única.
- */
-class FinancialCalculator {
-  /**
-   * Calcula la suma total para un mes.
-   * @param {Object} mes - Objeto que contiene ingresoLocal, ingresoExtranjera y tipoCambio.
-   * @returns {number} La suma total calculada.
-   */
-  static getSumTotal(mes) {
-    return mes.ingresoLocal + (mes.ingresoExtranjera * mes.tipoCambio);
-  }
-
-  /**
-   * Obtiene el valor inicial a partir del primer mes.
-   * @param {Array<Object>} meses - Lista de meses.
-   * @returns {number} Valor inicial.
-   */
-  static getValorInicial(meses) {
-    if (meses.length === 0) return 0;
-    return FinancialCalculator.getSumTotal(meses[0]);
-  }
-
-  /**
-   * Obtiene el valor final a partir del último mes.
-   * @param {Array<Object>} meses - Lista de meses.
-   * @returns {number} Valor final.
-   */
-  static getValorFinal(meses) {
-    if (meses.length === 0) return 0;
-    return FinancialCalculator.getSumTotal(meses[meses.length - 1]);
-  }
-
-  /**
-   * Calcula el rendimiento nominal.
-   * @param {number} valorInicial - Valor inicial.
-   * @param {number} valorFinal - Valor final.
-   * @returns {number} Rendimiento nominal.
-   */
-  static getRnNominal(valorInicial, valorFinal) {
-    if (valorInicial === 0) return 0;
-    return (valorFinal - valorInicial) / valorInicial;
-  }
-
-  /**
-   * Calcula el factor de inflación acumulada.
-   * @param {Array<Object>} meses - Lista de meses.
-   * @returns {number} Factor de inflación acumulada.
-   */
-  static getFactorInflacion(meses) {
-    return meses.reduce((acum, mes) => acum * (1 + (mes.inflacion / 100)), 1);
-  }
-
-  /**
-   * Calcula la inflación acumulada.
-   * @param {number} factorInflacion - Factor de inflación.
-   * @returns {number} Inflación acumulada.
-   */
-  static getInflacionAcumulada(factorInflacion) {
-    return factorInflacion - 1;
-  }
-
-  /**
-   * Calcula el factor ajustado para la inflación en ingresos convertidos.
-   * @param {Array<Object>} meses - Lista de meses.
-   * @returns {number} Factor ajustado.
-   */
-  static getFactorAjustado(meses) {
-    return meses.reduce((acum, mes) => {
-      return acum * ((mes.variacionTC !== 0)
-        ? ((1 + mes.inflacion / 100) / (1 + mes.variacionTC / 100))
-        : (1 + mes.inflacion / 100));
-    }, 1);
-  }
-
-  /**
-   * Calcula la inflación acumulada ajustada.
-   * @param {number} factorAjustado - Factor ajustado.
-   * @returns {number} Inflación acumulada ajustada.
-   */
-  static getInflacionAcumuladaAjustada(factorAjustado) {
-    return factorAjustado - 1;
-  }
-
-  /**
-   * Calcula el rendimiento real.
-   * @param {number} rnNominal - Rendimiento nominal.
-   * @param {number} inflacionAcumulada - Inflación acumulada.
-   * @returns {number} Rendimiento real.
-   */
-  static getRendimientoReal(rnNominal, inflacionAcumulada) {
-    if (1 + inflacionAcumulada === 0) return 0;
-    return ((1 + rnNominal) / (1 + inflacionAcumulada)) - 1;
-  }
-
-  /**
-   * Calcula el poder adquisitivo real.
-   * @param {number} valorFinal - Valor final.
-   * @param {number} factorInflacion - Factor de inflación.
-   * @returns {number} Poder adquisitivo real.
-   */
-  static getPoderAdquisitivo(valorFinal, factorInflacion) {
-    if (factorInflacion === 0) return 0;
-    return valorFinal / factorInflacion;
-  }
-
-  /**
-   * Calcula la ganancia real.
-   * @param {number} poderAdquisitivo - Poder adquisitivo real.
-   * @param {number} valorInicial - Valor inicial.
-   * @returns {number} Ganancia real.
-   */
-  static getGananciaReal(poderAdquisitivo, valorInicial) {
-    return poderAdquisitivo - valorInicial;
-  }
-
-  /**
-   * Calcula el porcentaje de ganancia real.
-   * @param {number} gananciaReal - Ganancia real.
-   * @param {number} valorInicial - Valor inicial.
-   * @returns {number} Porcentaje de ganancia real.
-   */
-  static getPorcentajeGananciaReal(gananciaReal, valorInicial) {
-    if (valorInicial === 0) return 0;
-    return (gananciaReal / valorInicial) * 100;
-  }
-}
-
-/**
- * MetricsCalculator
- * Orquesta el uso de FinancialCalculator para calcular todas las métricas financieras.
- */
-class MetricsCalculator {
-  calcular(periodo) {
-    if (periodo.meses.length === 0) return {};
-    const mesesConSuma = periodo.meses.map(mes => ({
-      ...mes,
-      sumaTotal: FinancialCalculator.getSumTotal(mes)
-    }));
-
-    const valorInicial = FinancialCalculator.getValorInicial(mesesConSuma);
-    const valorFinal = FinancialCalculator.getValorFinal(mesesConSuma);
-    const rnNominal = FinancialCalculator.getRnNominal(valorInicial, valorFinal);
-    const factorInflacion = FinancialCalculator.getFactorInflacion(periodo.meses);
-    const inflacionAcumulada = FinancialCalculator.getInflacionAcumulada(factorInflacion);
-    const factorAjustado = FinancialCalculator.getFactorAjustado(periodo.meses);
-    const inflacionAcumuladaAjustada = FinancialCalculator.getInflacionAcumuladaAjustada(factorAjustado);
-    const rendimientoReal = FinancialCalculator.getRendimientoReal(rnNominal, inflacionAcumulada);
-    const poderAdquisitivo = FinancialCalculator.getPoderAdquisitivo(valorFinal, factorInflacion);
-    const gananciaReal = FinancialCalculator.getGananciaReal(poderAdquisitivo, valorInicial);
-    const porcentajeGananciaReal = FinancialCalculator.getPorcentajeGananciaReal(gananciaReal, valorInicial);
-
-    return {
-      valorInicial,
-      valorFinal,
-      rnNominal,
-      inflacionAcumulada,
-      inflacionAcumuladaAjustada,
-      rendimientoReal,
-      poderAdquisitivo,
-      gananciaReal,
-      porcentajeGananciaReal
-    };
-  }
-}
-
-/**
- * PeriodoService
- * Maneja la gestión de datos: cargar, guardar y manipular periodos en el localStorage con encriptación.
- */
-class PeriodoService {
-  constructor() {
-    this.periodos = [];
-    this.cargarPeriodos();
-  }
-
-  cargarPeriodos() {
-    const encryptedData = localStorage.getItem('periodos');
-    if (encryptedData) {
-      try {
-        const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
-        const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
-        this.periodos = JSON.parse(decryptedData);
-      } catch (err) {
-        console.error("Error al desencriptar periodos:", err);
-        this.periodos = [];
-      }
-    } else {
-      this.periodos = [];
-    }
-  }
-
-  guardarPeriodos() {
-    try {
-      const data = JSON.stringify(this.periodos);
-      const encryptedData = CryptoJS.AES.encrypt(data, secretKey).toString();
-      localStorage.setItem('periodos', encryptedData);
-    } catch (err) {
-      console.error("Error al encriptar periodos:", err);
-    }
-  }
-
-  crearPeriodo(nombre) {
-    const nuevoPeriodo = {
-      id: Date.now().toString(),
-      nombre,
-      meses: [],
-      fechaCreacion: new Date().toLocaleString(),
-      ultimaActualizacion: new Date().toLocaleString()
-    };
-    this.periodos.push(nuevoPeriodo);
-    this.guardarPeriodos();
-    return nuevoPeriodo;
-  }
-
-  actualizarPeriodo(periodoActualizado) {
-    const index = this.periodos.findIndex(p => p.id === periodoActualizado.id);
-    if (index !== -1) {
-      periodoActualizado.ultimaActualizacion = new Date().toLocaleString();
-      this.periodos[index] = periodoActualizado;
-      this.guardarPeriodos();
-    }
-  }
-
-  eliminarPeriodo(id) {
-    this.periodos = this.periodos.filter(p => p.id !== id);
-    this.guardarPeriodos();
-  }
-
-  obtenerPeriodos() {
-    return this.periodos;
-  }
-
-  obtenerPeriodoPorId(id) {
-    return this.periodos.find(p => p.id === id);
-  }
-}
-
-/**
+ * uiManager.js
+ * 
  * UIManager
  * Maneja la interacción con el DOM y la comunicación entre la UI y los servicios.
  */
-class UIManager {
+import { PeriodoService } from "./periodoService.js"
+import { MetricsCalculator } from './metricsCalculator.js';
+
+export class UIManager {
   constructor() {
     this.periodoService = new PeriodoService();
     this.metricsCalculator = new MetricsCalculator();
@@ -349,6 +111,7 @@ class UIManager {
   }
 
   handleNuevoPeriodo() {
+    console.group("HOLAAAAAAAAAAAAAAAA")
     const nombre = prompt("Ingrese el nombre del nuevo periodo (ej. '2024 - Q1')");
     if (!nombre) return;
     this.periodoService.crearPeriodo(nombre);
@@ -435,6 +198,8 @@ class UIManager {
     this.renderMeses();
   }
 
+
+
   handleAgregarMes() {
     if (!this.periodoSeleccionado) return;
     const mesId = prompt("Ingrese el identificador del mes (Ej: 04/24)");
@@ -450,6 +215,11 @@ class UIManager {
     this.periodoSeleccionado.meses.push(nuevoMes);
     this.periodoService.actualizarPeriodo(this.periodoSeleccionado);
     this.renderMeses();
+  }
+  handleGuardarPeriodo() {
+    if (!this.periodoSeleccionado) return;
+    this.periodoService.actualizarPeriodo(this.periodoSeleccionado);
+    alert("Periodo guardado con éxito.");
   }
 
   actualizarMes(index, campo, valor) {
@@ -501,6 +271,3 @@ class UIManager {
     `;
   }
 }
-
-const uiManager = new UIManager();
-window.uiManager = uiManager;
