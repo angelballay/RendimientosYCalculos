@@ -16,7 +16,6 @@
       <nav>
         <ul>
           <li><a href="#" id="menu-gestion-periodos" aria-label="Gestión de periodos">Gestión de periodos</a></li>
-          <!-- Se pueden agregar más opciones en el futuro -->
         </ul>
       </nav>
     </aside>
@@ -30,6 +29,7 @@
       <!-- Vista Home: Listado de Periodos -->
       <section id="view-home">
         <h2>Listado de Periodos</h2>
+        <!-- Aquí se inyectará la tabla con la lista de periodos -->
         <div id="periodos-lista" class="card-container"></div>
         <button id="btn-nuevo-periodo" aria-label="Crear Nuevo Periodo">Crear Nuevo Periodo</button>
       </section>
@@ -37,6 +37,7 @@
       <!-- Vista Detalle: Edición de Meses del Periodo -->
       <section id="view-detalle" class="hidden">
         <h2 id="periodo-nombre">Detalles del Periodo</h2>
+        <h3 id="periodo-hasta">Fecha periodo</h3>
         <div id="meses-lista" class="card-container"></div>
         <div class="acciones-meses">
           <button id="btn-agregar-mes" aria-label="Agregar Nuevo Mes">Agregar Mes</button>
@@ -63,6 +64,45 @@
   <footer>
     <p>&copy; 2025 Periodos App. Todos los derechos reservados.</p>
   </footer>
-  <script src="script.js"></script>
+
+  <!-- Modal para confirmación de eliminación -->
+  <div id="delete-confirmation-modal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-labelledby="deleteModalTitle">
+      <p id="deleteModalTitle">¿Está seguro de eliminar este periodo?</p>
+      <div class="modal-actions">
+        <button id="confirm-delete-btn" class="btn-danger">Eliminar</button>
+        <button id="cancel-delete-btn" class="btn-neutral">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para creación de periodo -->
+  <div id="create-period-modal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-labelledby="createPeriodModalTitle">
+      <h3 id="createPeriodModalTitle">Crear Nuevo Periodo</h3>
+      <form id="create-period-form">
+        <label for="period-start">Fecha de Inicio (Mes/Año):</label>
+        <input type="month" id="period-start" name="periodStart" required>
+        
+        <label for="period-end">Fecha de Fin (Mes/Año):</label>
+        <input type="month" id="period-end" name="periodEnd" required>
+        
+        <label for="period-name">Nombre del Periodo:</label>
+        <input type="text" id="period-name" name="periodName" required>
+        
+        <label for="period-description">Descripción:</label>
+        <textarea id="period-description" name="periodDescription" required></textarea>
+        
+        <div id="create-period-error" class="error-message" style="color: red; display: none;"></div>
+        
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary">Crear Periodo</button>
+          <button type="button" id="cancel-create-period-btn" class="btn-neutral">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="index.js"></script>
 </body>
 </html>

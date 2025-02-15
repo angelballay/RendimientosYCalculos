@@ -1,11 +1,177 @@
-// script.js
-
 // Definición de la clave secreta para encriptar y desencriptar en localStorage
 const secretKey = "mySuperSecretKey123";
 
 /**
- * Clase PeriodoService
- * Se encarga de la gestión de datos: cargar, guardar y manipular periodos en el localStorage con encriptación.
+ * FinancialCalculator
+ * Clase con métodos estáticos para realizar cálculos financieros específicos.
+ * Cada método se encarga de un único cómputo, siguiendo el principio de responsabilidad única.
+ */
+class FinancialCalculator {
+  /**
+   * Calcula la suma total para un mes.
+   * @param {Object} mes - Objeto que contiene ingresoLocal, ingresoExtranjera y tipoCambio.
+   * @returns {number} La suma total calculada.
+   */
+  static getSumTotal(mes) {
+    return mes.ingresoLocal + (mes.ingresoExtranjera * mes.tipoCambio);
+  }
+
+  /**
+   * Obtiene el valor inicial a partir del primer mes.
+   * @param {Array<Object>} meses - Lista de meses.
+   * @returns {number} Valor inicial.
+   */
+  static getValorInicial(meses) {
+    if (meses.length === 0) return 0;
+    return FinancialCalculator.getSumTotal(meses[0]);
+  }
+
+  /**
+   * Obtiene el valor final a partir del último mes.
+   * @param {Array<Object>} meses - Lista de meses.
+   * @returns {number} Valor final.
+   */
+  static getValorFinal(meses) {
+    if (meses.length === 0) return 0;
+    return FinancialCalculator.getSumTotal(meses[meses.length - 1]);
+  }
+
+  /**
+   * Calcula el rendimiento nominal.
+   * @param {number} valorInicial - Valor inicial.
+   * @param {number} valorFinal - Valor final.
+   * @returns {number} Rendimiento nominal.
+   */
+  static getRnNominal(valorInicial, valorFinal) {
+    if (valorInicial === 0) return 0;
+    return (valorFinal - valorInicial) / valorInicial;
+  }
+
+  /**
+   * Calcula el factor de inflación acumulada.
+   * @param {Array<Object>} meses - Lista de meses.
+   * @returns {number} Factor de inflación acumulada.
+   */
+  static getFactorInflacion(meses) {
+    return meses.reduce((acum, mes) => acum * (1 + (mes.inflacion / 100)), 1);
+  }
+
+  /**
+   * Calcula la inflación acumulada.
+   * @param {number} factorInflacion - Factor de inflación.
+   * @returns {number} Inflación acumulada.
+   */
+  static getInflacionAcumulada(factorInflacion) {
+    return factorInflacion - 1;
+  }
+
+  /**
+   * Calcula el factor ajustado para la inflación en ingresos convertidos.
+   * @param {Array<Object>} meses - Lista de meses.
+   * @returns {number} Factor ajustado.
+   */
+  static getFactorAjustado(meses) {
+    return meses.reduce((acum, mes) => {
+      return acum * ((mes.variacionTC !== 0)
+        ? ((1 + mes.inflacion / 100) / (1 + mes.variacionTC / 100))
+        : (1 + mes.inflacion / 100));
+    }, 1);
+  }
+
+  /**
+   * Calcula la inflación acumulada ajustada.
+   * @param {number} factorAjustado - Factor ajustado.
+   * @returns {number} Inflación acumulada ajustada.
+   */
+  static getInflacionAcumuladaAjustada(factorAjustado) {
+    return factorAjustado - 1;
+  }
+
+  /**
+   * Calcula el rendimiento real.
+   * @param {number} rnNominal - Rendimiento nominal.
+   * @param {number} inflacionAcumulada - Inflación acumulada.
+   * @returns {number} Rendimiento real.
+   */
+  static getRendimientoReal(rnNominal, inflacionAcumulada) {
+    if (1 + inflacionAcumulada === 0) return 0;
+    return ((1 + rnNominal) / (1 + inflacionAcumulada)) - 1;
+  }
+
+  /**
+   * Calcula el poder adquisitivo real.
+   * @param {number} valorFinal - Valor final.
+   * @param {number} factorInflacion - Factor de inflación.
+   * @returns {number} Poder adquisitivo real.
+   */
+  static getPoderAdquisitivo(valorFinal, factorInflacion) {
+    if (factorInflacion === 0) return 0;
+    return valorFinal / factorInflacion;
+  }
+
+  /**
+   * Calcula la ganancia real.
+   * @param {number} poderAdquisitivo - Poder adquisitivo real.
+   * @param {number} valorInicial - Valor inicial.
+   * @returns {number} Ganancia real.
+   */
+  static getGananciaReal(poderAdquisitivo, valorInicial) {
+    return poderAdquisitivo - valorInicial;
+  }
+
+  /**
+   * Calcula el porcentaje de ganancia real.
+   * @param {number} gananciaReal - Ganancia real.
+   * @param {number} valorInicial - Valor inicial.
+   * @returns {number} Porcentaje de ganancia real.
+   */
+  static getPorcentajeGananciaReal(gananciaReal, valorInicial) {
+    if (valorInicial === 0) return 0;
+    return (gananciaReal / valorInicial) * 100;
+  }
+}
+
+/**
+ * MetricsCalculator
+ * Orquesta el uso de FinancialCalculator para calcular todas las métricas financieras.
+ */
+class MetricsCalculator {
+  calcular(periodo) {
+    if (periodo.meses.length === 0) return {};
+    const mesesConSuma = periodo.meses.map(mes => ({
+      ...mes,
+      sumaTotal: FinancialCalculator.getSumTotal(mes)
+    }));
+
+    const valorInicial = FinancialCalculator.getValorInicial(mesesConSuma);
+    const valorFinal = FinancialCalculator.getValorFinal(mesesConSuma);
+    const rnNominal = FinancialCalculator.getRnNominal(valorInicial, valorFinal);
+    const factorInflacion = FinancialCalculator.getFactorInflacion(periodo.meses);
+    const inflacionAcumulada = FinancialCalculator.getInflacionAcumulada(factorInflacion);
+    const factorAjustado = FinancialCalculator.getFactorAjustado(periodo.meses);
+    const inflacionAcumuladaAjustada = FinancialCalculator.getInflacionAcumuladaAjustada(factorAjustado);
+    const rendimientoReal = FinancialCalculator.getRendimientoReal(rnNominal, inflacionAcumulada);
+    const poderAdquisitivo = FinancialCalculator.getPoderAdquisitivo(valorFinal, factorInflacion);
+    const gananciaReal = FinancialCalculator.getGananciaReal(poderAdquisitivo, valorInicial);
+    const porcentajeGananciaReal = FinancialCalculator.getPorcentajeGananciaReal(gananciaReal, valorInicial);
+
+    return {
+      valorInicial,
+      valorFinal,
+      rnNominal,
+      inflacionAcumulada,
+      inflacionAcumuladaAjustada,
+      rendimientoReal,
+      poderAdquisitivo,
+      gananciaReal,
+      porcentajeGananciaReal
+    };
+  }
+}
+
+/**
+ * PeriodoService
+ * Maneja la gestión de datos: cargar, guardar y manipular periodos en el localStorage con encriptación.
  */
 class PeriodoService {
   constructor() {
@@ -76,60 +242,8 @@ class PeriodoService {
 }
 
 /**
- * Clase MetricsCalculator
- * Realiza todos los cálculos financieros a partir de la información del periodo.
- */
-class MetricsCalculator {
-  calcular(periodo) {
-    // Calcular sumaTotal para cada mes: sumaTotal = ingresoLocal + (ingresoExtranjera * tipoCambio)
-    const mesesConSuma = periodo.meses.map(mes => ({
-      ...mes,
-      sumaTotal: mes.ingresoLocal + (mes.ingresoExtranjera * mes.tipoCambio)
-    }));
-
-    const valorInicial = mesesConSuma[0].sumaTotal;
-    const valorFinal = mesesConSuma[mesesConSuma.length - 1].sumaTotal;
-    const rnNominal = (valorFinal - valorInicial) / valorInicial;
-
-    // Inflación Acumulada (divisa local)
-    const factorInflacion = periodo.meses.reduce((acum, mes) => acum * (1 + mes.inflacion / 100), 1);
-    const inflacionAcumulada = factorInflacion - 1;
-
-    // Inflación Acumulada Ajustada para Ingresos Convertidos
-    const factorAjustado = periodo.meses.reduce((acum, mes) => {
-      const ajuste = mes.variacionTC !== 0
-        ? (1 + mes.inflacion / 100) / (1 + mes.variacionTC / 100)
-        : (1 + mes.inflacion / 100);
-      return acum * ajuste;
-    }, 1);
-    const inflacionAcumuladaAjustada = factorAjustado - 1;
-
-    // Rendimiento Real (usando inflación acumulada general)
-    const rendimientoReal = ((1 + rnNominal) / (1 + inflacionAcumulada)) - 1;
-
-    // Poder Adquisitivo Real y Ganancia Real
-    const poderAdquisitivo = valorFinal / factorInflacion;
-    const gananciaReal = poderAdquisitivo - valorInicial;
-    const porcentajeGananciaReal = (gananciaReal / valorInicial) * 100;
-
-    return {
-      valorInicial,
-      valorFinal,
-      rnNominal,
-      inflacionAcumulada,
-      inflacionAcumuladaAjustada,
-      rendimientoReal,
-      poderAdquisitivo,
-      gananciaReal,
-      porcentajeGananciaReal
-    };
-  }
-}
-
-/**
- * Clase UIManager
+ * UIManager
  * Maneja la interacción con el DOM y la comunicación entre la UI y los servicios.
- * Se implementan vistas separadas para Home (listado de periodos), Detalle (edición de meses) y Resultados.
  */
 class UIManager {
   constructor() {
@@ -142,14 +256,11 @@ class UIManager {
   }
 
   cacheSelectors() {
-    // Vistas
     this.$viewHome = document.getElementById('view-home');
     this.$viewDetalle = document.getElementById('view-detalle');
     this.$viewResultados = document.getElementById('view-resultados');
-    // Elementos Home
     this.$periodosLista = document.getElementById('periodos-lista');
     this.$btnNuevoPeriodo = document.getElementById('btn-nuevo-periodo');
-    // Elementos Detalle
     this.$periodoNombre = document.getElementById('periodo-nombre');
     this.$mesesLista = document.getElementById('meses-lista');
     this.$btnAgregarMes = document.getElementById('btn-agregar-mes');
@@ -157,11 +268,9 @@ class UIManager {
     this.$btnGuardarPeriodo = document.getElementById('btn-guardar-periodo');
     this.$btnVerResultados = document.getElementById('btn-ver-resultados');
     this.$btnVolverHome = document.getElementById('btn-volver-home');
-    // Elementos Resultados
     this.$metrics = document.getElementById('metrics');
     this.$btnVolverDetalle = document.getElementById('btn-volver-detalle');
     this.$btnVolverHome2 = document.getElementById('btn-volver-home2');
-    // Menú lateral
     this.$menuGestionPeriodos = document.getElementById('menu-gestion-periodos');
   }
 
@@ -180,7 +289,6 @@ class UIManager {
     });
   }
 
-  // Navegación entre vistas
   mostrarHome() {
     this.$viewHome.classList.remove('hidden');
     this.$viewDetalle.classList.add('hidden');
@@ -206,7 +314,6 @@ class UIManager {
     this.calcularYMostrarMetricas();
   }
 
-  // Renderiza el listado de periodos en la vista Home
   renderPeriodos() {
     const periodos = this.periodoService.obtenerPeriodos();
     this.$periodosLista.innerHTML = '';
@@ -220,9 +327,7 @@ class UIManager {
     });
   }
 
-  // Crea la tarjeta de un periodo (incluye ganancia real)
   createPeriodoCard(periodo) {
-    // Si el periodo tiene métricas calculadas (gananciaReal) no se recalcula aquí
     const ganancia = (periodo.gananciaReal !== undefined)
       ? periodo.gananciaReal.toFixed(2)
       : "N/A";
@@ -260,21 +365,18 @@ class UIManager {
     }
   }
 
-  // Al seleccionar un periodo, se carga en la vista Detalle
   handleSeleccionarPeriodo(id) {
     this.periodoSeleccionado = this.periodoService.obtenerPeriodoPorId(id);
     if (!this.periodoSeleccionado) return;
     this.mostrarDetalle();
   }
 
-  // Método para saltar directamente a la vista de Resultados desde Home
   handleVerResultados(id) {
     this.periodoSeleccionado = this.periodoService.obtenerPeriodoPorId(id);
     if (!this.periodoSeleccionado) return;
     this.mostrarResultados();
   }
 
-  // Renderiza los meses en la vista Detalle
   renderMeses() {
     if (!this.periodoSeleccionado) return;
     this.$mesesLista.innerHTML = '';
@@ -289,7 +391,6 @@ class UIManager {
     this.recalcularVariaciones();
   }
 
-  // Crea la tarjeta para un mes
   createMesCard(mes, index) {
     const card = document.createElement('div');
     card.className = 'card';
@@ -315,7 +416,6 @@ class UIManager {
     return card;
   }
 
-  // Copia los datos del último mes para crear un nuevo mes
   handleRepetirMes() {
     if (!this.periodoSeleccionado || this.periodoSeleccionado.meses.length === 0) {
       alert("No hay datos previos para repetir.");
@@ -354,7 +454,8 @@ class UIManager {
 
   actualizarMes(index, campo, valor) {
     if (!this.periodoSeleccionado) return;
-    this.periodoSeleccionado.meses[index][campo] = (campo === 'mes') ? valor : parseFloat(valor) || 0;
+    const nuevoValor = (campo === 'mes') ? valor : (isNaN(parseFloat(valor)) ? 0 : parseFloat(valor));
+    this.periodoSeleccionado.meses[index][campo] = nuevoValor;
     this.recalcularVariaciones();
     this.calcularYMostrarMetricas();
     this.periodoService.actualizarPeriodo(this.periodoSeleccionado);
@@ -383,11 +484,9 @@ class UIManager {
     this.periodoService.actualizarPeriodo(this.periodoSeleccionado);
   }
 
-  // Calcula métricas, actualiza la ganancia real en el objeto y muestra el reporte en la vista Resultados
   calcularYMostrarMetricas() {
     if (!this.periodoSeleccionado || this.periodoSeleccionado.meses.length === 0) return;
     const metrics = this.metricsCalculator.calcular(this.periodoSeleccionado);
-    // Almacenamos la ganancia real en el modelo del periodo para mostrarla en la tarjeta de Home
     this.periodoSeleccionado.gananciaReal = metrics.gananciaReal;
     this.periodoSeleccionado.porcentajeGananciaReal = metrics.porcentajeGananciaReal;
     this.$metrics.innerHTML = `
