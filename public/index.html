@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestión de Periodos y Cálculos Financieros</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Google Fonts con fallback -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- CryptoJS desde CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+  <div id="app-container">
+    <!-- Menú lateral -->
+    <aside id="sidebar">
+      <nav>
+        <ul>
+          <li><a href="#" id="menu-gestion-periodos" aria-label="Gestión de periodos">Gestión de periodos</a></li>
+          <!-- Se pueden agregar más opciones en el futuro -->
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main id="main-content">
+      <header>
+        <h1>Gestión de Periodos y Cálculos Financieros</h1>
+      </header>
+
+      <!-- Vista Home: Listado de Periodos -->
+      <section id="view-home">
+        <h2>Listado de Periodos</h2>
+        <div id="periodos-lista" class="card-container"></div>
+        <button id="btn-nuevo-periodo" aria-label="Crear Nuevo Periodo">Crear Nuevo Periodo</button>
+      </section>
+
+      <!-- Vista Detalle: Edición de Meses del Periodo -->
+      <section id="view-detalle" class="hidden">
+        <h2 id="periodo-nombre">Detalles del Periodo</h2>
+        <div id="meses-lista" class="card-container"></div>
+        <div class="acciones-meses">
+          <button id="btn-agregar-mes" aria-label="Agregar Nuevo Mes">Agregar Mes</button>
+          <button id="btn-repetir-mes" aria-label="Repetir Datos del Mes Anterior">Repetir del Mes Anterior</button>
+          <button id="btn-guardar-periodo" aria-label="Guardar Cambios">Guardar Cambios</button>
+        </div>
+        <div class="navegacion-detalle">
+          <button id="btn-ver-resultados" aria-label="Ver Resultados">Ver Resultados</button>
+          <button id="btn-volver-home" aria-label="Volver al Listado de Periodos">Volver a Periodos</button>
+        </div>
+      </section>
+
+      <!-- Vista Resultados: Reporte de Métricas -->
+      <section id="view-resultados" class="hidden">
+        <h2>Resultados del Periodo</h2>
+        <div id="metrics"></div>
+        <div class="navegacion-resultados">
+          <button id="btn-volver-detalle" aria-label="Volver al Detalle del Periodo">Volver al Detalle</button>
+          <button id="btn-volver-home2" aria-label="Volver al Listado de Periodos">Volver a Periodos</button>
+        </div>
+      </section>
+    </main>
+  </div>
+  <footer>
+    <p>&copy; 2025 Periodos App. Todos los derechos reservados.</p>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>
