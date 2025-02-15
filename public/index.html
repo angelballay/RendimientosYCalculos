@@ -29,6 +29,7 @@
       <!-- Vista Home: Listado de Periodos -->
       <section id="view-home">
         <h2>Listado de Periodos</h2>
+        <!-- Aquí se inyectará la tabla con la lista de periodos -->
         <div id="periodos-lista" class="card-container"></div>
         <button id="btn-nuevo-periodo" aria-label="Crear Nuevo Periodo">Crear Nuevo Periodo</button>
       </section>
@@ -62,6 +63,18 @@
   <footer>
     <p>&copy; 2025 Periodos App. Todos los derechos reservados.</p>
   </footer>
+
+  <!-- Modal para confirmación de eliminación -->
+  <div id="delete-confirmation-modal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-content">
+      <p>¿Está seguro de eliminar este periodo?</p>
+      <div class="modal-actions">
+        <button id="confirm-delete-btn" class="btn-danger">Eliminar</button>
+        <button id="cancel-delete-btn" class="btn-neutral">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Se actualiza la llamada al archivo index.js como módulo -->
   <script type="module" src="index.js"></script>
 </body>

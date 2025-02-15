@@ -12,6 +12,7 @@ export class UIManager {
     this.periodoService = new PeriodoService();
     this.metricsCalculator = new MetricsCalculator();
     this.periodoSeleccionado = null;
+    this.periodoAEliminar = null; // para almacenar el ID del periodo que se va a eliminar
     this.cacheSelectors();
     this.bindEvents();
     this.mostrarHome();
@@ -34,6 +35,11 @@ export class UIManager {
     this.$btnVolverDetalle = document.getElementById('btn-volver-detalle');
     this.$btnVolverHome2 = document.getElementById('btn-volver-home2');
     this.$menuGestionPeriodos = document.getElementById('menu-gestion-periodos');
+
+    // Modal de confirmación
+    this.$deleteConfirmationModal = document.getElementById('delete-confirmation-modal');
+    this.$confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+    this.$cancelDeleteBtn = document.getElementById('cancel-delete-btn');
   }
 
   bindEvents() {
@@ -49,6 +55,15 @@ export class UIManager {
       e.preventDefault();
       this.mostrarHome();
     });
+
+    // Eventos del modal de eliminación
+    this.$confirmDeleteBtn.addEventListener('click', () => {
+      if (this.periodoAEliminar) {
+        this.handleEliminarPeriodo(this.periodoAEliminar);
+      }
+      this.hideDeleteConfirmation();
+    });
+    this.$cancelDeleteBtn.addEventListener('click', () => this.hideDeleteConfirmation());
   }
 
   mostrarHome() {
@@ -76,42 +91,89 @@ export class UIManager {
     this.calcularYMostrarMetricas();
   }
 
+  // NUEVO: Genera una tabla en lugar de cards
   renderPeriodos() {
     const periodos = this.periodoService.obtenerPeriodos();
-    this.$periodosLista.innerHTML = '';
     if (periodos.length === 0) {
       this.$periodosLista.innerHTML = '<p>No hay periodos creados.</p>';
       return;
     }
-    periodos.forEach(periodo => {
-      const card = this.createPeriodoCard(periodo);
-      this.$periodosLista.appendChild(card);
+
+    // Construimos la tabla
+    let tableHtml = `
+      <table class="table-periodos">
+        <thead>
+          <tr>
+            <th>Nombre del periodo</th>
+            <th>Fecha inicio</th>
+            <th>Fecha fin</th>
+            <th>% de rendimiento real</th>
+            <th>Rendimiento real (divisa local)</th>
+            <th>Detalles</th>
+            <th>Eliminar</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    periodos.forEach((periodo) => {
+      // Obtenemos fechaInicio y fechaFin a partir de los meses
+      const fechaInicio = periodo.meses[0]?.mes || 'N/A';
+      const fechaFin = periodo.meses[periodo.meses.length - 1]?.mes || 'N/A';
+      // % de rendimiento real y ganancia real (divisa local)
+      const porcentaje = (periodo.porcentajeGananciaReal !== undefined)
+        ? periodo.porcentajeGananciaReal.toFixed(2) + '%'
+        : 'N/A';
+      const ganancia = (periodo.gananciaReal !== undefined)
+        ? periodo.gananciaReal.toFixed(2)
+        : 'N/A';
+
+      tableHtml += `
+        <tr>
+          <td>${periodo.nombre}</td>
+          <td>${fechaInicio}</td>
+          <td>${fechaFin}</td>
+          <td>${porcentaje}</td>
+          <td>${ganancia}</td>
+          <td>
+            <button class="btn-primary" onclick="uiManager.handleSeleccionarPeriodo('${periodo.id}')">
+              Detalles
+            </button>
+          </td>
+          <td>
+            <button class="btn-danger" onclick="uiManager.showDeleteConfirmation('${periodo.id}')">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      `;
     });
+
+    tableHtml += `
+        </tbody>
+      </table>
+    `;
+
+    this.$periodosLista.innerHTML = tableHtml;
   }
 
-  createPeriodoCard(periodo) {
-    const ganancia = (periodo.gananciaReal !== undefined)
-      ? periodo.gananciaReal.toFixed(2)
-      : "N/A";
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <h3>${periodo.nombre}</h3>
-      <p><strong>Meses:</strong> ${periodo.meses.length}</p>
-      <p><strong>Creado:</strong> ${periodo.fechaCreacion}</p>
-      <p><strong>Última actualización:</strong> ${periodo.ultimaActualizacion}</p>
-      <p class="ganancia-real"><strong>Ganancia Real:</strong> ${ganancia}</p>
-      <div class="acciones">
-        <button onclick="uiManager.handleSeleccionarPeriodo('${periodo.id}')" aria-label="Editar Periodo">Editar</button>
-        <button onclick="uiManager.handleEliminarPeriodo('${periodo.id}')" aria-label="Eliminar Periodo">Eliminar</button>
-        <button onclick="uiManager.handleVerResultados('${periodo.id}')" aria-label="Ver Resultados">Resultados</button>
-      </div>
-    `;
-    return card;
+  showDeleteConfirmation(periodoId) {
+    this.periodoAEliminar = periodoId;
+    this.$deleteConfirmationModal.classList.remove('hidden');
+    this.$deleteConfirmationModal.setAttribute('aria-hidden', 'false');
+  }
+
+  hideDeleteConfirmation() {
+    this.periodoAEliminar = null;
+    this.$deleteConfirmationModal.classList.add('hidden');
+    this.$deleteConfirmationModal.setAttribute('aria-hidden', 'true');
+  }
+
+  createPeriodoCard() {
+    // Eliminado o deprecado. Ya no se utiliza la vista en formato "card".
   }
 
   handleNuevoPeriodo() {
-    console.group("HOLAAAAAAAAAAAAAAAA")
     const nombre = prompt("Ingrese el nombre del nuevo periodo (ej. '2024 - Q1')");
     if (!nombre) return;
     this.periodoService.crearPeriodo(nombre);
@@ -119,13 +181,12 @@ export class UIManager {
   }
 
   handleEliminarPeriodo(id) {
-    if (confirm("¿Está seguro de eliminar este periodo?")) {
-      this.periodoService.eliminarPeriodo(id);
-      if (this.periodoSeleccionado && this.periodoSeleccionado.id === id) {
-        this.periodoSeleccionado = null;
-      }
-      this.renderPeriodos();
+    // Muestra pop-up en la vista. Al confirmar, se elimina.
+    this.periodoService.eliminarPeriodo(id);
+    if (this.periodoSeleccionado && this.periodoSeleccionado.id === id) {
+      this.periodoSeleccionado = null;
     }
+    this.renderPeriodos();
   }
 
   handleSeleccionarPeriodo(id) {
@@ -198,8 +259,6 @@ export class UIManager {
     this.renderMeses();
   }
 
-
-
   handleAgregarMes() {
     if (!this.periodoSeleccionado) return;
     const mesId = prompt("Ingrese el identificador del mes (Ej: 04/24)");
@@ -216,6 +275,7 @@ export class UIManager {
     this.periodoService.actualizarPeriodo(this.periodoSeleccionado);
     this.renderMeses();
   }
+
   handleGuardarPeriodo() {
     if (!this.periodoSeleccionado) return;
     this.periodoService.actualizarPeriodo(this.periodoSeleccionado);
