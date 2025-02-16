@@ -13,6 +13,7 @@ export class UIManager {
     this.metricsCalculator = new MetricsCalculator();
     this.periodoSeleccionado = null;
     this.periodoAEliminar = null; // Para almacenar el ID del periodo a eliminar
+    this.isEditingTable = false;  // Controla si la tabla entera está en modo edición
     this.cacheSelectors();
     this.bindEvents();
     this.mostrarHome();
@@ -36,6 +37,7 @@ export class UIManager {
     this.$btnVolverDetalle = document.getElementById("btn-volver-detalle");
     this.$btnVolverHome2 = document.getElementById("btn-volver-home2");
     this.$menuGestionPeriodos = document.getElementById("menu-gestion-periodos");
+    this.$editButton;
 
     // Modal de confirmación de eliminación
     this.$deleteConfirmationModal = document.getElementById("delete-confirmation-modal");
@@ -78,7 +80,29 @@ export class UIManager {
       this.handleCreatePeriodSubmit();
     });
     this.$cancelCreatePeriodBtn.addEventListener("click", () => this.hideCreatePeriodModal());
+
+    // Detectar Enter global para guardar la tabla si está en modo edición
+    document.addEventListener("keydown", (e) => {
+      if (this.isEditingTable && e.key === "Enter") {
+        e.preventDefault();
+        this.guardarCambiosTabla();
+      }
+    });
   }
+
+  handleEditingPeriod(){
+    this.$editButton.textContent = this.isEditingTable ? "Guardar Cambios" : "Editar Tabla";
+    this.$editButton.onclick = () => {
+      if (!this.isEditingTable) {
+        // Activar modo edición
+        this.toggleTableEditMode(true);
+      } else {
+        // Guardar cambios
+        this.guardarCambiosTabla();
+      }
+    };
+  }
+  
 
   showCreatePeriodModal() {
     this.$createPeriodError.style.display = "none";
@@ -194,24 +218,28 @@ export class UIManager {
     this.periodoService.actualizarPeriodo(this.periodoSeleccionado);
     this.renderMeses();
   }
-
+  iteracion = 0;
   handleRepetirMes() {
-    if (!this.periodoSeleccionado || this.periodoSeleccionado.meses.length === 0) {
-      alert("No hay datos previos para repetir.");
-      return;
+    if(this.periodoSeleccionado){
+      this.iteracion++;
+      console.log({periodo:this.periodoSeleccionado,mes:this.periodoSeleccionado.meses,iteration:this.iteracion})
+      if(this.periodoSeleccionado.meses){
+        let index = this.periodoSeleccionado.meses.length - 1
+        const ultimoMes = this.periodoSeleccionado.meses[index];
+        const nuevoMes = {
+          mes: this.getNuevoMesNombre(),
+          inflacion: ultimoMes.inflacion,
+          tipoCambio: ultimoMes.tipoCambio,
+          ingresoLocal: ultimoMes.ingresoLocal,
+          ingresoExtranjera: ultimoMes.ingresoExtranjera,
+          variacionTC: 0,
+        };
+        this.periodoSeleccionado.meses.push(nuevoMes);
+        this.periodoService.actualizarPeriodo(this.periodoSeleccionado);
+        this.renderMeses();
+      }
     }
-    const ultimoMes = this.periodoSeleccionado.meses[this.periodoSeleccionado.meses.length - 1];
-    const nuevoMes = {
-      mes: this.getNuevoMesNombre(),
-      inflacion: ultimoMes.inflacion,
-      tipoCambio: ultimoMes.tipoCambio,
-      ingresoLocal: ultimoMes.ingresoLocal,
-      ingresoExtranjera: ultimoMes.ingresoExtranjera,
-      variacionTC: 0,
-    };
-    this.periodoSeleccionado.meses.push(nuevoMes);
-    this.periodoService.actualizarPeriodo(this.periodoSeleccionado);
-    this.renderMeses();
+    
   }
 
   renderPeriodos() {
@@ -220,8 +248,8 @@ export class UIManager {
       this.$periodosLista.innerHTML = "<p>No hay periodos creados.</p>";
       return;
     }
-    let tableHtml = `
-      <table class="table-periodos">
+    let tableHtml = 
+      `<table class="table-periodos">
         <thead>
           <tr>
             <th>Nombre del periodo</th>
@@ -234,8 +262,7 @@ export class UIManager {
             <th>Duplicar</th>
           </tr>
         </thead>
-        <tbody>
-    `;
+        <tbody>`;
     periodos.forEach((periodo) => {
       const fechaInicio = periodo.meses[0]?.mes || "N/A";
       const fechaFin = periodo.meses[periodo.meses.length - 1]?.mes || "N/A";
@@ -245,8 +272,8 @@ export class UIManager {
       const ganancia = (periodo.gananciaReal !== undefined)
         ? periodo.gananciaReal.toFixed(2)
         : "N/A";
-      tableHtml += `
-        <tr>
+      tableHtml += 
+        `<tr>
           <td>${periodo.nombre}</td>
           <td>${fechaInicio}</td>
           <td>${fechaFin}</td>
@@ -267,13 +294,11 @@ export class UIManager {
               Duplicar
             </button>
           </td>
-        </tr>
-      `;
+        </tr>`;
     });
-    tableHtml += `
-        </tbody>
-      </table>
-    `;
+    tableHtml += 
+        `</tbody>
+      </table>`;
     this.$periodosLista.innerHTML = tableHtml;
   }
 
@@ -341,61 +366,163 @@ export class UIManager {
     this.calcularYMostrarMetricas();
   }
 
+  /**
+   * Renderiza la tabla de meses. Se agrega un botón "Editar Tabla" o "Guardar Cambios"
+   * según el estado actual de edición (isEditingTable).
+   */
   renderMeses() {
     if (!this.periodoSeleccionado) return;
-    this.$mesesLista.innerHTML = "";
     if (this.periodoSeleccionado.meses.length === 0) {
       this.$mesesLista.innerHTML = "<p>No hay meses en este periodo.</p>";
       return;
     }
+    // Crear tabla
+    const table = document.createElement("table");
+    table.className = "table-meses";
+    if (this.isEditingTable) {
+      table.classList.add("table-editing");
+    }
+
+    // Encabezado
+    const thead = document.createElement("thead");
+    thead.innerHTML = `
+      <tr>
+        <th>Mes</th>
+        <th>Inflación (%)</th>
+        <th>Tipo de Cambio</th>
+        <th>Ingreso Local</th>
+        <th>Ingreso Extranjera</th>
+        <th>Variación TC</th>
+        <th>Eliminar</th>
+      </tr>
+    `;
+    table.appendChild(thead);
+
+    // Cuerpo
+    const tbody = document.createElement("tbody");
     this.periodoSeleccionado.meses.forEach((mes, index) => {
-      const card = this.createMesCard(mes, index);
-      this.$mesesLista.appendChild(card);
+      const row = document.createElement("tr");
+      row.addEventListener("dblclick", (event) => {
+        event.preventDefault();
+        this.EditRow(row);
+        this.handleEditingPeriod();
+      });
+      row.innerHTML = `
+        <td data-field="mes">${mes.mes}</td>
+        <td class="editable" data-field="inflacion">${mes.inflacion}</td>
+        <td class="editable" data-field="tipoCambio">${mes.tipoCambio}</td>
+        <td class="editable" data-field="ingresoLocal">${mes.ingresoLocal}</td>
+        <td class="editable" data-field="ingresoExtranjera">${mes.ingresoExtranjera}</td>
+        <td>${mes.variacionTC ? mes.variacionTC.toFixed(2) : "N/A"}%</td>
+        <td>
+          ${
+            this.renderDeleteButton(index)
+
+            
+          }
+        </td>
+      `;
+      tbody.appendChild(row);
     });
+    table.appendChild(tbody);
+
+    // Botón para alternar edición de la tabla
+    this.$editButton = document.createElement("button");
+    this.$editButton.classList.add("btn-primary");
+    
+    this.handleEditingPeriod();
+    this.$mesesLista.innerHTML = "";
+    this.$mesesLista.appendChild(table);
+    this.$mesesLista.appendChild(this.$editButton);
+
     this.recalcularVariaciones();
   }
 
-  createMesCard(mes, index) {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <label>Mes:
-        <input type="text" value="${mes.mes}" onchange="uiManager.actualizarMes(${index}, 'mes', this.value)" placeholder="Ej: 04/24">
-      </label>
-      <label>Inflación (%):
-        <input type="number" step="any" value="${mes.inflacion}" onchange="uiManager.actualizarMes(${index}, 'inflacion', this.value)" placeholder="Ej: 4.2">
-      </label>
-      <label>Tipo de Cambio:
-        <input type="number" step="any" value="${mes.tipoCambio}" onchange="uiManager.actualizarMes(${index}, 'tipoCambio', this.value)" placeholder="Ej: 1085">
-      </label>
-      <label>Ingreso Local:
-        <input type="number" step="any" value="${mes.ingresoLocal}" onchange="uiManager.actualizarMes(${index}, 'ingresoLocal', this.value)" placeholder="Ej: 100000">
-      </label>
-      <label>Ingreso Extranjero:
-        <input type="number" step="any" value="${mes.ingresoExtranjera}" onchange="uiManager.actualizarMes(${index}, 'ingresoExtranjera', this.value)" placeholder="Ej: 500">
-      </label>
-      <p>Variación TC: ${mes.variacionTC ? mes.variacionTC.toFixed(2) : "N/A"}%</p>
-      <button onclick="uiManager.eliminarMes(${index})" aria-label="Eliminar Mes">Eliminar</button>
-    `;
-    return card;
+  
+  /**
+   * Retorna el HTML del botón "Eliminar" solo si la fila es la primera o la última.
+   */
+  renderDeleteButton(index) {
+    const totalRows = this.periodoSeleccionado.meses.length;
+    if (totalRows === 1) {
+      // Si solo hay una fila, no se puede eliminar
+      return `<button class="btn-danger" disabled>Eliminar</button>`;
+    }
+    // Solo permitimos eliminar si es la primera fila (index=0) o la última (index=totalRows-1)
+    if (index === 0 || index === totalRows - 1) {
+      return `<button class="btn-danger" onclick="uiManager.eliminarMes(${index})">Eliminar</button>`;
+    }
+    // En caso contrario, se deshabilita
+    return "<p>No es posible eliminar</p>";
   }
 
-  handleGuardarPeriodo() {
-    if (!this.periodoSeleccionado) return;
+  /**
+   * Activa o desactiva el modo edición global de la tabla.
+   */
+  toggleTableEditMode(activate) {
+    this.isEditingTable = activate;
+    // Re-render para que aparezca la tabla en modo edición
+    this.renderMeses();
+    if (this.isEditingTable) {
+      // Hacer celdas editables
+      const table = document.querySelector(".table-meses");
+      const editableCells = table.querySelectorAll("td.editable");
+      editableCells.forEach(cell => {
+        cell.contentEditable = "true";
+        cell.classList.add("editing-cell");
+      });
+    } else {
+      // Desactivar edición
+      const table = document.querySelector(".table-meses");
+      const editableCells = table.querySelectorAll("td.editable");
+      editableCells.forEach(cell => {
+        cell.contentEditable = "false";
+        cell.classList.remove("editing-cell");
+      });
+    }
+  }
+
+  EditRow(row){
+    this.isEditingTable = true;
+    const editableCells = row.querySelectorAll("td.editable");
+    editableCells.forEach(cell => {
+      cell.contentEditable = "true";
+      cell.classList.add("editing-cell");
+    });
+  }
+
+  /**
+   * Recorre todas las celdas editables y actualiza el modelo.
+   * Luego recalcula métricas, cierra modo edición y muestra pop-up de confirmación.
+   */
+  guardarCambiosTabla() {
+    // Obtener todas las celdas editables
+    const table = document.querySelector(".table-meses");
+    const editableCells = table.querySelectorAll("td.editable");
+    editableCells.forEach((cell, idx) => {
+      const field = cell.getAttribute("data-field");
+      let newValue = cell.textContent.trim();
+      if (field !== "mes") {
+        // Convertir a número
+        const parsed = parseFloat(newValue);
+        newValue = isNaN(parsed) ? 0 : parsed;
+      }
+      // Localizar el row al que pertenece
+      const row = cell.parentElement; 
+      const rowIndex = Array.from(row.parentElement.children).indexOf(row);
+      this.periodoSeleccionado.meses[rowIndex][field] = newValue;
+    });
+
+    // Guardar en servicio
     this.periodoService.actualizarPeriodo(this.periodoSeleccionado);
-    alert("Periodo guardado con éxito.");
-  }
-
-  actualizarMes(index, campo, valor) {
-    if (!this.periodoSeleccionado) return;
-    const nuevoValor = (campo === "mes")
-      ? valor
-      : (isNaN(parseFloat(valor)) ? 0 : parseFloat(valor));
-    this.periodoSeleccionado.meses[index][campo] = nuevoValor;
+    // Recalcular
     this.recalcularVariaciones();
     this.calcularYMostrarMetricas();
-    this.periodoService.actualizarPeriodo(this.periodoSeleccionado);
-    this.renderMeses();
+    // Desactivar modo edición
+    this.toggleTableEditMode(false);
+
+    // Pop-up de confirmación
+    alert("Tabla guardada con éxito.");
   }
 
   eliminarMes(index) {
@@ -436,4 +563,14 @@ export class UIManager {
       <p><strong>Ganancia Real:</strong> ${metrics.gananciaReal.toFixed(2)} (${metrics.porcentajeGananciaReal.toFixed(2)}%)</p>
     `;
   }
+
+  handleGuardarPeriodo() {
+    if (!this.periodoSeleccionado) return;
+    this.periodoService.actualizarPeriodo(this.periodoSeleccionado);
+    alert("Periodo guardado con éxito.");
+  }
 }
+
+// Instancia global
+export const uiManager = new UIManager();
+window.uiManager = uiManager;

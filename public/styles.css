@@ -2,7 +2,6 @@
 /* GLOBAL STYLES         */
 /* ---------------------- */
 
-/* Base de la tipografía y colores de fondo */
 body {
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
@@ -59,7 +58,6 @@ body {
   backdrop-filter: blur(4px);
 }
 
-/* ENCABEZADO */
 header {
   background: rgba(0, 0, 0, 0.3);
   padding: 20px;
@@ -82,7 +80,6 @@ header h1 {
   opacity: 0.9;
 }
 
-/* Clase unificada para textos de ayuda */
 .help-text {
   font-size: 0.9rem;
   color: #ececec;
@@ -90,7 +87,6 @@ header h1 {
   opacity: 0.85;
 }
 
-/* SECCIONES DE VISTAS */
 section {
   background: rgba(255, 255, 255, 0.15);
   padding: 20px;
@@ -111,10 +107,6 @@ h2 {
   color: #fff;
 }
 
-/* ---------------------- */
-/* LISTADOS: TARJETAS Y TABLAS  */
-/* ---------------------- */
-
 .card-container {
   display: flex;
   flex-wrap: wrap;
@@ -122,7 +114,6 @@ h2 {
   margin-bottom: 15px;
 }
 
-/* Tarjetas (para otros contextos) */
 .card {
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid #555;
@@ -139,8 +130,12 @@ h2 {
   opacity: 0.95;
 }
 
-/* Estilos para la tabla de periodos */
-.table-periodos {
+/* ---------------------- */
+/* TABLAS                */
+/* ---------------------- */
+
+.table-periodos,
+.table-meses {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
@@ -151,33 +146,39 @@ h2 {
 }
 
 .table-periodos th,
-.table-periodos td {
+.table-meses th,
+.table-periodos td,
+.table-meses td {
   padding: 12px 15px;
   text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
-.table-periodos thead tr {
+.table-periodos thead tr,
+.table-meses thead tr {
   background: rgba(0,0,0,0.2);
 }
 
-.table-periodos thead th {
+.table-periodos thead th,
+.table-meses thead th {
   font-weight: 500;
   color: #fff;
   border-bottom: 1px solid #00bfff;
 }
 
-.table-periodos tbody tr {
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  will-change: background-color;
-}
-
-.table-periodos tbody tr:hover {
+.table-periodos tbody tr:hover,
+.table-meses tbody tr:hover {
   background-color: rgba(255,255,255,0.1);
   box-shadow: 0 0 8px rgba(255,255,255,0.2);
 }
 
-.table-periodos td {
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+/* Modo edición global */
+.table-editing {
+  border: 2px dashed #ffeb3b; /* Un borde amarillo para indicar modo edición */
+}
+
+.table-editing thead tr {
+  background: rgba(255, 255, 0, 0.3) !important; /* Un suave tono amarillo */
 }
 
 /* ---------------------- */
@@ -201,7 +202,6 @@ button:focus {
   outline: none;
 }
 
-/* Botón primario (azul brillante) */
 .btn-primary {
   background-color: #008cff;
   color: #fff;
@@ -212,7 +212,6 @@ button:focus {
   background-color: #0073cc;
 }
 
-/* Botón secundario (gris) */
 .btn-secondary {
   background-color: #6c757d;
   color: #fff;
@@ -223,7 +222,6 @@ button:focus {
   background-color: #5a6268;
 }
 
-/* Botón éxito (verde) */
 .btn-success {
   background-color: #28a745;
   color: #fff;
@@ -234,7 +232,6 @@ button:focus {
   background-color: #218838;
 }
 
-/* Botón peligro (rojo) */
 .btn-danger {
   background-color: #dc3545;
   color: #fff;
@@ -245,7 +242,6 @@ button:focus {
   background-color: #c82333;
 }
 
-/* Botón neutro (gris claro) */
 .btn-neutral {
   background-color: #999;
   color: #fff;
@@ -256,10 +252,6 @@ button:focus {
   background-color: #888;
 }
 
-/* ---------------------- */
-/* ACCIONES EN VISTA     */
-/* ---------------------- */
-
 .acciones-meses,
 .navegacion-detalle,
 .navegacion-resultados {
@@ -269,7 +261,6 @@ button:focus {
   margin-top: 10px;
 }
 
-/* Inputs y Textareas en tarjetas y modales */
 .card input[type="text"],
 .card input[type="number"],
 .card textarea,
@@ -283,7 +274,6 @@ button:focus {
   font-size: 0.9rem;
 }
 
-/* Mensajes de error */
 .error-message {
   color: #d9534f;
   font-weight: 500;
@@ -343,27 +333,16 @@ button:focus {
   font-size: 1rem;
 }
 
-/* Responsividad - pantallas pequeñas */
-@media (max-width: 480px) {
-  .modal-content {
-    width: 95%;
-    padding: 20px;
-  }
-  .modal-title {
-    font-size: 1.2rem;
-  }
-  .modal-input,
-  .modal-textarea {
-    font-size: 0.9rem;
-  }
-  .modal-btn {
-    font-size: 0.9rem;
-  }
-}
+/* ---------------------- */
+/* EDICIÓN DE CELDAS     */
+/* ---------------------- */
 
-/* ---------------------- */
-/* FOOTER                */
-/* ---------------------- */
+.editing-cell {
+  background-color: #fffbea !important;
+  color: #333;
+  transition: background-color 0.3s ease;
+  outline: 1px dashed #ccc;
+}
 
 footer {
   background-color: rgba(0, 0, 0, 0.3);
@@ -373,10 +352,6 @@ footer {
   font-size: 0.9rem;
   margin-top: 20px;
 }
-
-/* ---------------------- */
-/* RESPONSIVE ADJUSTMENTS*/
-/* ---------------------- */
 
 @media (max-width: 600px) {
   #sidebar {
