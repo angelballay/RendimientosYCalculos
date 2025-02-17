@@ -1,4 +1,4 @@
-export default class ApiClient {
+export class ApiClient {
     /**
      * @param {string} baseUrl - URL base para la API.
      * @param {object} defaultOptions - Opciones por defecto (por ejemplo, headers comunes).

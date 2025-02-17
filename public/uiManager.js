@@ -6,6 +6,7 @@
  */
 import { PeriodoService } from "./periodoService.js";
 import { MetricsCalculator } from "./metricsCalculator.js";
+import { ExchangeAutoFillUI } from "./js/exchangeAutoFillUI.js";
 
 export class UIManager {
   constructor() {
@@ -16,6 +17,9 @@ export class UIManager {
     this.isEditingTable = false;  // Controla si la tabla entera está en modo edición
     this.cacheSelectors();
     this.bindEvents();
+
+    // Instancia la nueva UI para autocompletar TC
+    this.autoExchangeUI = new ExchangeAutoFillUI(this);
     this.mostrarHome();
   }
 
@@ -429,11 +433,26 @@ export class UIManager {
     // Botón para alternar edición de la tabla
     this.$editButton = document.createElement("button");
     this.$editButton.classList.add("btn-primary");
+
+    // Botón para completar TC
+    const autoExchangeBtn = document.createElement("button");
+    autoExchangeBtn.id = "btn-auto-exchange";
+    autoExchangeBtn.classList.add("btn-primary");
+    autoExchangeBtn.textContent = "Completar TC Dólar";
+    autoExchangeBtn.addEventListener("click", () => {
+      if (!this.periodoSeleccionado) {
+        alert("No hay un periodo seleccionado.");
+        return;
+      }
+      this.autoExchangeUI.showModal();
+    });
+
     
     this.handleEditingPeriod();
     this.$mesesLista.innerHTML = "";
     this.$mesesLista.appendChild(table);
     this.$mesesLista.appendChild(this.$editButton);
+    this.$mesesLista.appendChild(autoExchangeBtn);
 
     this.recalcularVariaciones();
   }
