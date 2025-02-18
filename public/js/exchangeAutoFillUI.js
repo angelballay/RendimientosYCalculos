@@ -56,8 +56,8 @@ export class ExchangeAutoFillUI {
             </div>
             
             <div id="modal-actions" class="modal-actions">
-              <button id="auto-exchange-confirm" class="btn-success">Confirmar</button>
               <button id="auto-exchange-cancel" class="btn-neutral">Cancelar</button>
+              <button id="auto-exchange-confirm" class="btn-success">Confirmar</button>
             </div>
           </div>
           <div id="inflation-spinner" class="spinner hidden"></div>
@@ -74,15 +74,14 @@ export class ExchangeAutoFillUI {
     this.inputsBlock = document.getElementById("exchange-inputs");
     this.spinner = document.getElementById("inflation-spinner");
     this.modalActions = document.getElementById("modal-actions");
-    const confirmBtn = document.getElementById("auto-exchange-confirm");
-    const cancelBtn = document.getElementById("auto-exchange-cancel");
+    this.confirmBtn = document.getElementById("auto-exchange-confirm");
+    this.cancelBtn = document.getElementById("auto-exchange-cancel");
 
-    confirmBtn.addEventListener("click", async () => {
+    this.confirmBtn.addEventListener("click", async () => {
       // Ocultamos errores previos
       this.hideError();
       // Mostramos spinner y deshabilitamos el botón
       this.setLoading(true);
-      confirmBtn.disabled = true;
 
       try {
         const selectedExchange = document.querySelector('input[name="exchange-type"]:checked').value;
@@ -97,15 +96,16 @@ export class ExchangeAutoFillUI {
         // En caso de error, mostramos error y ocultamos inputs
         this.showError("ERROR", err.message || err);
         this.hideInputs(); 
-        this.modalActionHandler(true)
+        this.modalActionHandler(true);
+        this.showBtnCancel(true);
+        this.showBtnConfirm(false);
       } finally {
         // Quitamos el spinner y habilitamos el botón
         this.setLoading(false);
-        confirmBtn.disabled = false;
       }
     });
 
-    cancelBtn.addEventListener("click", () => {
+    this.cancelBtn.addEventListener("click", () => {
       this.closeModal();
     });
   }
@@ -113,6 +113,9 @@ export class ExchangeAutoFillUI {
   showModal() {
     this.overlay.classList.remove("hidden");
     this.overlay.setAttribute("aria-hidden", "false");
+    this.showBtnCancel(true);
+    this.showBtnConfirm(true);
+    this.modalActionHandler(true);
   }
 
   closeModal() {
@@ -146,8 +149,23 @@ export class ExchangeAutoFillUI {
   }
 
   modalActionHandler(show){
-    show ? this.modalActions.classList.remove("hidden") : this.modalActions.classList.add("hidden")
+    this.showElement(this.modalActions,show);
   }
+
+  showBtnCancel(show){
+    this.showElement(this.cancelBtn,show);
+  }
+
+  showBtnConfirm(show){
+    this.showElement(this.confirmBtn,show);
+  }
+
+  
+  showElement(element,show){
+    show ? element.classList.remove("hidden") : element.classList.add("hidden");
+  }
+  
+
 
   // ---- Manejo de spinner ----
   setLoading(isLoading) {
