@@ -15,7 +15,11 @@
     <aside id="sidebar">
       <nav>
         <ul>
-          <li><a href="#" id="menu-gestion-periodos" aria-label="Gestión de periodos">Gestión de periodos</a></li>
+          <li>
+            <a href="#" id="menu-gestion-periodos" aria-label="Gestión de periodos">
+              Gestión de periodos
+            </a>
+          </li>
         </ul>
       </nav>
     </aside>
@@ -24,7 +28,9 @@
     <main id="main-content">
       <header>
         <h1>Gestión de Periodos y Cálculos Financieros</h1>
-        <p class="help-text app-subtitle">Administra tus planes y obtén proyecciones financieras precisas.</p>
+        <p class="help-text app-subtitle">
+          Administra tus planes y obtén proyecciones financieras precisas.
+        </p>
       </header>
 
       <!-- Vista Home: Listado de Periodos -->
@@ -34,7 +40,9 @@
           En esta sección encontrarás todos los planes creados. Haz clic en "Detalles" para ver la información completa o en "Eliminar" para remover un periodo.
         </p>
         <div id="periodos-lista" class="card-container"></div>
-        <button id="btn-nuevo-periodo" class="btn-primary" aria-label="Crear Nuevo Periodo">Crear Nuevo Periodo</button>
+        <button id="btn-nuevo-periodo" class="btn-primary" aria-label="Crear Nuevo Periodo">
+          Crear Nuevo Periodo
+        </button>
       </section>
 
       <!-- Vista Detalle: Edición de Meses del Periodo -->
@@ -43,13 +51,23 @@
         <h3 id="periodo-hasta" class="help-text"></h3>
         <div id="meses-lista" class="card-container"></div>
         <div class="acciones-meses">
-          <button id="btn-agregar-mes" class="btn-primary" aria-label="Agregar Nuevo Mes">Agregar Mes</button>
-          <button id="btn-repetir-mes" class="btn-secondary" aria-label="Repetir Datos del Mes Anterior">Repetir del Mes Anterior</button>
-          <button id="btn-guardar-periodo" class="btn-success" aria-label="Guardar Cambios">Guardar Cambios</button>
+          <button id="btn-agregar-mes" class="btn-primary" aria-label="Agregar Nuevo Mes">
+            Agregar Mes
+          </button>
+          <button id="btn-repetir-mes" class="btn-secondary" aria-label="Repetir Datos del Mes Anterior">
+            Repetir del Mes Anterior
+          </button>
+          <button id="btn-guardar-periodo" class="btn-success" aria-label="Guardar Cambios">
+            Guardar Cambios
+          </button>
         </div>
         <div class="navegacion-detalle">
-          <button id="btn-ver-resultados" class="btn-primary" aria-label="Ver Resultados">Ver Resultados</button>
-          <button id="btn-volver-home" class="btn-secondary" aria-label="Volver al Listado de Periodos">Volver a Periodos</button>
+          <button id="btn-ver-resultados" class="btn-primary" aria-label="Ver Resultados">
+            Ver Resultados
+          </button>
+          <button id="btn-volver-home" class="btn-secondary" aria-label="Volver al Listado de Periodos">
+            Volver a Periodos
+          </button>
         </div>
       </section>
 
@@ -61,18 +79,25 @@
         </p>
         <div id="metrics"></div>
         <div class="navegacion-resultados">
-          <button id="btn-volver-detalle" class="btn-secondary" aria-label="Volver al Detalle del Periodo">Volver al Detalle</button>
-          <button id="btn-volver-home2" class="btn-secondary" aria-label="Volver al Listado de Periodos">Volver a Periodos</button>
+          <button id="btn-volver-detalle" class="btn-secondary" aria-label="Volver al Detalle del Periodo">
+            Volver al Detalle
+          </button>
+          <button id="btn-volver-home2" class="btn-secondary" aria-label="Volver al Listado de Periodos">
+            Volver a Periodos
+          </button>
         </div>
       </section>
     </main>
   </div>
+
   <footer>
     <p>&copy; 2025 Periodos App. Todos los derechos reservados.</p>
   </footer>
 
+  <!-- Contenedor para la UI de autocompletar tipo de cambio -->
+  <div id="auto-exchange-ui-container"></div>
    <!-- Contenedor para la UI de autocompletar tipo de cambio -->
-   <div id="auto-exchange-ui-container"></div>
+   <div id="auto-inflation-ui-container"></div>
 
 
   <!-- Modal para confirmación de eliminación -->
@@ -93,18 +118,13 @@
       <form id="create-period-form">
         <label for="period-start" class="modal-label">Fecha de Inicio (Mes/Año):</label>
         <input type="month" id="period-start" name="periodStart" class="modal-input" required>
-        
         <label for="period-end" class="modal-label">Fecha de Fin (Mes/Año):</label>
         <input type="month" id="period-end" name="periodEnd" class="modal-input" required>
-        
         <label for="period-name" class="modal-label">Nombre del Periodo:</label>
         <input type="text" id="period-name" name="periodName" class="modal-input" placeholder="Ej: 2024 - Q1" required>
-        
         <label for="period-description" class="modal-label">Descripción:</label>
         <textarea id="period-description" name="periodDescription" class="modal-textarea" placeholder="Breve descripción..." required></textarea>
-        
         <div id="create-period-error" class="error-message" style="display: none;"></div>
-        
         <div class="modal-actions">
           <button type="submit" class="btn-primary modal-btn">Crear Periodo</button>
           <button type="button" id="cancel-create-period-btn" class="btn-neutral modal-btn">Cancelar</button>
@@ -113,6 +133,8 @@
     </div>
   </div>
 
+  <!-- Scripts -->
+  <script type="module" src="js/InflationAutoFillUI.js"></script>
   <script type="module" src="js/exchangeAutoFillUI.js"></script>
   <script type="module" src="index.js"></script>
 </body>

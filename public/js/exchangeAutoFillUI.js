@@ -1,11 +1,19 @@
 // exchangeAutoFillUI.js
-import CambioDolarBlue from "./constants.js";
+import CambioDolarBlue from "./CambioDolarBlue.js";
 
 export class ExchangeAutoFillUI {
   constructor(uiManager) {
     this.uiManager = uiManager;
-    this.cambioDolarBlue = new CambioDolarBlue(); // Instancia para la API
+    this.cambioDolarBlue = new CambioDolarBlue();
     this.initModal();
+
+    // Referencias a elementos que usaremos
+    this.errorHTML = document.getElementById("exchange-error");
+    this.overlay = document.getElementById("auto-exchange-overlay");
+    this.formContent = document.getElementById("form-exchange-content");
+    this.inputsBlock = document.getElementById("exchange-inputs");
+    this.spinner = document.getElementById("inflation-spinner");
+
     this.bindEvents();
   }
 
@@ -14,67 +22,148 @@ export class ExchangeAutoFillUI {
     container.innerHTML = `
       <div class="modal-overlay hidden" id="auto-exchange-overlay" aria-hidden="true">
         <div class="modal-content" role="dialog" aria-labelledby="autoExchangeModalTitle">
+          
           <h3 id="autoExchangeModalTitle" class="modal-title">Completar Tipo de Cambio</h3>
-          <p>Esta opción permite cargar automáticamente el tipo de cambio (Blue u Oficial) desde la API.</p>
-          <div>
-            <label>
-              <input type="radio" name="exchange-type" value="blue" checked />
-              Usar Dólar Blue
-            </label>
-            <label>
-              <input type="radio" name="exchange-type" value="oficial" />
-              Usar Dólar Oficial
-            </label>
+          
+          <div id="exchange-error" class="hidden">
+            <h1></h1>
+            <p></p>
           </div>
-          <hr />
-          <div>
-            <label>
-              <input type="radio" name="apply-scope" value="all" checked />
-              Aplicar a todos los meses
-            </label>
-            <label>
-              <input type="radio" name="apply-scope" value="empty" />
-              Aplicar solo a meses sin TC
-            </label>
+          
+          <div id="form-exchange-content">
+            <p id="parrafo-modal">Esta opción permite cargar automáticamente el tipo de cambio (Blue u Oficial) desde la API.</p>
+            
+            <div id="exchange-inputs">
+              <label>
+                <input type="radio" name="exchange-type" value="blue" checked />
+                Usar Dólar Blue
+              </label>
+              <label>
+                <input type="radio" name="exchange-type" value="oficial" />
+                Usar Dólar Oficial
+              </label>
+              <hr />
+              <div>
+                <label>
+                  <input type="radio" name="apply-scope" value="all" checked />
+                  Aplicar a todos los meses
+                </label>
+                <label>
+                  <input type="radio" name="apply-scope" value="empty" />
+                  Aplicar solo a meses sin TC
+                </label>
+              </div>
+            </div>
+            
+            <div id="modal-actions" class="modal-actions">
+              <button id="auto-exchange-confirm" class="btn-success">Confirmar</button>
+              <button id="auto-exchange-cancel" class="btn-neutral">Cancelar</button>
+            </div>
           </div>
-          <div class="modal-actions">
-            <button id="auto-exchange-confirm" class="btn-success">Confirmar</button>
-            <button id="auto-exchange-cancel" class="btn-neutral">Cancelar</button>
-          </div>
+          <div id="inflation-spinner" class="spinner hidden"></div>
         </div>
       </div>
     `;
   }
 
   bindEvents() {
-    const overlay = document.getElementById("auto-exchange-overlay");
+    // Los elementos se crean tras initModal, así que debemos volver a tomarlos
+    this.overlay = document.getElementById("auto-exchange-overlay");
+    this.errorHTML = document.getElementById("exchange-error");
+    this.formContent = document.getElementById("form-exchange-content");
+    this.inputsBlock = document.getElementById("exchange-inputs");
+    this.spinner = document.getElementById("inflation-spinner");
+    this.modalActions = document.getElementById("modal-actions");
     const confirmBtn = document.getElementById("auto-exchange-confirm");
     const cancelBtn = document.getElementById("auto-exchange-cancel");
 
     confirmBtn.addEventListener("click", async () => {
-      const selectedExchange = document.querySelector('input[name="exchange-type"]:checked').value;
-      const selectedScope = document.querySelector('input[name="apply-scope"]:checked').value;
+      // Ocultamos errores previos
+      this.hideError();
+      // Mostramos spinner y deshabilitamos el botón
+      this.setLoading(true);
+      confirmBtn.disabled = true;
 
-      // Pequeño feedback (en una app real, se usaría un spinner)
-      alert("Obteniendo datos...");
+      try {
+        const selectedExchange = document.querySelector('input[name="exchange-type"]:checked').value;
+        const selectedScope = document.querySelector('input[name="apply-scope"]:checked').value;
 
-      await this.fillExchangeRates(selectedExchange, selectedScope);
+        await this.fillExchangeRates(selectedExchange, selectedScope);
 
-      // Cerrar modal
-      overlay.classList.add("hidden");
-      overlay.setAttribute("aria-hidden", "true");
+        // Si todo va bien, cerramos el modal
+        this.closeModal();
+
+      } catch (err) {
+        // En caso de error, mostramos error y ocultamos inputs
+        this.showError("ERROR", err.message || err);
+        this.hideInputs(); 
+        this.modalActionHandler(true)
+      } finally {
+        // Quitamos el spinner y habilitamos el botón
+        this.setLoading(false);
+        confirmBtn.disabled = false;
+      }
     });
 
     cancelBtn.addEventListener("click", () => {
-      overlay.classList.add("hidden");
-      overlay.setAttribute("aria-hidden", "true");
+      this.closeModal();
     });
   }
 
   showModal() {
-    const overlay = document.getElementById("auto-exchange-overlay");
-    overlay.classList.remove("hidden");
-    overlay.setAttribute("aria-hidden", "false");
+    this.overlay.classList.remove("hidden");
+    this.overlay.setAttribute("aria-hidden", "false");
+  }
+
+  closeModal() {
+    this.overlay.classList.add("hidden");
+    this.overlay.setAttribute("aria-hidden", "true");
+    // Restauramos el formulario para la próxima vez
+    this.showInputs();
+    this.hideError();
+  }
+
+  // ---- Manejo de error ----
+  showError(errorTitle, errorDescription) {
+    this.errorHTML.classList.remove("hidden");
+    this.errorHTML.children[0].innerText = errorTitle;       // <h1>
+    this.errorHTML.children[1].innerText = errorDescription; // <p>
+  }
+
+  hideError() {
+    this.errorHTML.classList.add("hidden");
+  }
+
+  // ---- Manejo de inputs ----
+  hideInputs() {
+    this.inputsBlock.classList.add("hidden");
+    document.getElementById("parrafo-modal").classList.add("hidden");
+  }
+
+  showInputs() {
+    this.inputsBlock.classList.remove("hidden");
+    document.getElementById("parrafo-modal").classList.remove("hidden");
+  }
+
+  modalActionHandler(show){
+    show ? this.modalActions.classList.remove("hidden") : this.modalActions.classList.add("hidden")
+  }
+
+  // ---- Manejo de spinner ----
+  setLoading(isLoading) {
+    if (isLoading) {
+      this.spinner.classList.remove("hidden");
+      // Ocultamos inputs mientras carga
+      this.hideInputs();
+     this.modalActionHandler(false)
+    } else {
+      this.spinner.classList.add("hidden");
+      // Si no hay error visible, mostramos los inputs
+      if (this.errorHTML.classList.contains("hidden")) {
+        this.showInputs();
+        this.modalActionHandler(true)
+      }
+    }
   }
 
   /**
@@ -85,8 +174,7 @@ export class ExchangeAutoFillUI {
   async fillExchangeRates(selectedExchange, selectedScope) {
     const periodo = this.uiManager.periodoSeleccionado;
     if (!periodo || !periodo.meses || periodo.meses.length === 0) {
-      alert("No hay meses para completar.");
-      return;
+      throw new Error("No hay meses para completar.");
     }
 
     const errores = [];
@@ -120,18 +208,16 @@ export class ExchangeAutoFillUI {
       }
     }
 
-    // Guardar en servicio
+    // Guardar en servicio y actualizar la UI
     this.uiManager.periodoService.actualizarPeriodo(periodo);
-    // Re-render
-    this.uiManager.renderMeses();
-    // Recalcular métricas
+    this.uiManager.periodDetailUI.renderMeses(periodo);
     this.uiManager.calcularYMostrarMetricas();
 
     if (errores.length > 0) {
-      alert(`Se completó el TC con errores en los siguientes meses: ${errores.join(", ")}. ` +
-            `Se asignó "0" a esos meses.`);
-    } else {
-      alert("Tipo de cambio completado sin errores.");
+      throw new Error(
+        `Se completó el TC con errores en los siguientes meses: ${errores.join(", ")}. ` +
+        `Se asignó "0" a esos meses.`
+      );
     }
   }
 }

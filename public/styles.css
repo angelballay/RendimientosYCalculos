@@ -362,3 +362,28 @@ footer {
     flex: 1 1 100%;
   }
 }
+
+/* ===============================
+   Estilos para el Spinner de Carga
+   =============================== */
+
+   .spinner {
+    /* Un círculo con borde semi-transparente y un borde superior en color azul brillante */
+    border: 8px solid rgba(255, 255, 255, 0.3);
+    border-top: 8px solid #00bfff; /* Azul consistente con la app */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto; /* Centramos el spinner */
+  }
+  
+  /* Animación de rotación */
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
