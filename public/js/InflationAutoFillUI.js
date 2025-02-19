@@ -13,7 +13,7 @@ export default class InflationAutoFillUI {
     const container = document.getElementById("auto-inflation-ui-container");
     container.innerHTML = `
       <div class="modal-overlay hidden" id="auto-inflation-overlay" aria-hidden="true">
-        <div class="modal-content" role="dialog" aria-labelledby="autoInflationModalTitle"><
+        <div class="modal-content" role="dialog" aria-labelledby="autoInflationModalTitle">
         <div  id="form-inflation-content">
           <h3 id="autoInflationModalTitle" class="modal-title">Actualizar Inflación Mensual</h3>
           <p>Esta opción carga automáticamente la inflación mensual desde la API del BCRA.</p>
@@ -29,8 +29,8 @@ export default class InflationAutoFillUI {
               Actualizar solo filas sin dato
           </div>
           <div class="modal-actions">
-            <button id="auto-inflation-confirm" class="btn-success">Confirmar</button>
-            <button id="auto-inflation-cancel" class="btn-neutral">Cancelar</button>
+            <button id="auto-inflation-confirm" class="btn-success">Actualizar</button>
+            <button id="auto-inflation-cancel" class="btn-neutral">Cerrar</button>
           </div>
           <div id="inflation-message" class="modal-message"></div>
         </div>
@@ -129,11 +129,7 @@ export default class InflationAutoFillUI {
 
   showSpinner(show) {
     const spinner = document.getElementById("inflation-spinner");
-    if (show) {
-      spinner.classList.remove("hidden");
-    } else {
-      spinner.classList.add("hidden");
-    }
+    show? spinner.classList.remove("hidden") : spinner.classList.add("hidden");
   }
 
   showMessage(message, isError = false) {
